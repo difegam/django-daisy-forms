@@ -17,3 +17,14 @@ def test_ci_declares_each_supported_django_series() -> None:
 
     for version in ("5.2", "6.0", "6.1"):
         assert f'"{version}"' in workflow
+
+
+def test_readme_documents_tailwind_source_contract() -> None:
+    readme = Path("README.md").read_text()
+
+    assert "Tailwind CSS 4.1" in readme
+    assert "daisy_forms_css" in readme
+
+
+def test_readme_documents_quality_entry_point() -> None:
+    assert "just check" in Path("README.md").read_text()

@@ -1,6 +1,11 @@
+from typing import cast
+
+import pytest
 from django import forms
-from django.template import Context, Template
+from django.template import Context, Template, TemplateDoesNotExist
 from django.test import override_settings
+
+from daisy_forms.boundfield import DaisyBoundField
 
 
 class ContactForm(forms.Form):
@@ -116,3 +121,39 @@ def test_clearable_file_input_uses_daisy_file_classes() -> None:
     assert 'class="file-input w-full"' in output
     assert 'href="/uploads/report.pdf"' in output
     assert 'class="checkbox"' in output
+
+
+class CustomOptionRadio(forms.RadioSelect):
+    option_template_name = "custom/radio_option.html"
+
+
+class CustomOptionCheckboxes(forms.CheckboxSelectMultiple):
+    option_template_name = "custom/checkbox_option.html"
+
+
+class CustomOptionForm(forms.Form):
+    plan = forms.ChoiceField(choices=[("a", "A")], widget=CustomOptionRadio)
+    features = forms.MultipleChoiceField(
+        choices=[("a", "A")], widget=CustomOptionCheckboxes
+    )
+
+
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_custom_option_templates_are_not_replaced() -> None:
+    form = CustomOptionForm()
+
+    for name, option_template in (
+        ("plan", "custom/radio_option.html"),
+        ("features", "custom/checkbox_option.html"),
+    ):
+        with pytest.raises(TemplateDoesNotExist, match=option_template):
+            form[name].as_widget()
+
+
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_empty_template_override_does_not_fall_back_to_default() -> None:
+    field = cast(DaisyBoundField, ContactForm()["email"])
+    field.template_override = ""
+
+    with pytest.raises(TemplateDoesNotExist):
+        field.as_field_group()

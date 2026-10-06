@@ -25,19 +25,20 @@ def check_daisy_forms_configuration(
     from .renderers import DaisyFormRenderer
 
     try:
-        renderer_candidate = import_string(renderer_path)
-    except (ImportError, AttributeError, ValueError):
-        renderer_candidate = None
-
-    if (
-        renderer_candidate is None
-        or not isinstance(renderer_candidate, type)
-        or not issubclass(renderer_candidate, DaisyFormRenderer)
-    ):
+        renderer = import_string(renderer_path)
+    except ImportError as exc:
         messages.append(
             checks.Warning(
-                "FORM_RENDERER is not DaisyFormRenderer or a subclass of it.",
+                f"FORM_RENDERER {renderer_path!r} could not be imported: {exc}",
                 id="daisy_forms.W001",
             )
         )
+    else:
+        if not (isinstance(renderer, type) and issubclass(renderer, DaisyFormRenderer)):
+            messages.append(
+                checks.Warning(
+                    "FORM_RENDERER is not DaisyFormRenderer or a subclass of it.",
+                    id="daisy_forms.W001",
+                )
+            )
     return messages

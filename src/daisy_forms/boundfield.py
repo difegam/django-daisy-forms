@@ -3,13 +3,40 @@
 from __future__ import annotations
 
 import copy
-from typing import Any, cast
+from collections.abc import Mapping
+from types import MappingProxyType
+from typing import Any, Final, cast
 
 from django.forms.boundfield import BoundField
 from django.forms.widgets import Widget
 from django.utils.safestring import SafeString
 
 from .classes import WIDGET_CLASSES, daisy_class_for
+
+_SIZED_CLASSES: Final = frozenset({"input", "textarea", "select", "file-input"})
+
+# stock widget template -> (stock option, daisy template, daisy option)
+_DAISY_TEMPLATES: Final[Mapping[str, tuple[str | None, str, str | None]]] = {
+    "django/forms/widgets/radio.html": (
+        "django/forms/widgets/radio_option.html",
+        "daisy_forms/widgets/radio.html",
+        "daisy_forms/widgets/radio_option.html",
+    ),
+    "django/forms/widgets/checkbox_select.html": (
+        "django/forms/widgets/checkbox_option.html",
+        "daisy_forms/widgets/checkbox_select.html",
+        "daisy_forms/widgets/checkbox_option.html",
+    ),
+    "django/forms/widgets/clearable_file_input.html": (
+        None,
+        "daisy_forms/widgets/clearable_file_input.html",
+        None,
+    ),
+}
+
+
+def merge_class(existing: str | None, extra: str) -> str:
+    return " ".join(part for part in (existing, extra) if part)
 
 
 def _uses_stock_template(widget: Widget) -> bool:
@@ -27,15 +54,14 @@ def _uses_stock_template(widget: Widget) -> bool:
 class DaisyBoundField(BoundField):
     """A Django bound field that adds daisyUI classes without mutating widgets."""
 
-    extra_attrs: dict[str, str]
-    template_override: str | None
-    label_override: str | None
+    template_override: str | None = None
+
+    extra_attrs: Mapping[str, str] = MappingProxyType({})
 
     @property
     def template_name(self) -> str:
-        template_override = getattr(self, "template_override", None)
-        if isinstance(template_override, str):
-            return template_override
+        if self.template_override is not None:
+            return self.template_override
         return super().template_name
 
     def build_widget_attrs(
@@ -49,19 +75,19 @@ class DaisyBoundField(BoundField):
         if base_class is None or widget.is_hidden:
             return built
 
-        classes: list[str] = []
-        for token in (
-            base_class,
-            f"{base_class}-error" if self.errors else None,
-            *(str(widget.attrs.get("class", "")).split()),
-            *(str(built.get("class", "")).split()),
-        ):
-            if token and token not in classes:
-                classes.append(token)
-        if (
-            base_class in {"input", "textarea", "select", "file-input"}
-            and "w-full" not in classes
-        ):
+        classes = list(
+            dict.fromkeys(
+                token
+                for token in (
+                    base_class,
+                    f"{base_class}-error" if self.errors else None,
+                    *str(widget.attrs.get("class", "")).split(),
+                    *str(built.get("class", "")).split(),
+                )
+                if token
+            )
+        )
+        if base_class in _SIZED_CLASSES and "w-full" not in classes:
             classes.append("w-full")
         built["class"] = " ".join(classes)
         return built
@@ -73,20 +99,17 @@ class DaisyBoundField(BoundField):
         only_initial: bool = False,
     ) -> SafeString:
         widget = copy.copy(widget or self.field.widget)
-        if widget.template_name == "django/forms/widgets/radio.html":
-            widget.template_name = "daisy_forms/widgets/radio.html"
-            widget_any = cast(Any, widget)
-            widget_any.option_template_name = "daisy_forms/widgets/radio_option.html"
-        elif widget.template_name == "django/forms/widgets/checkbox_select.html":
-            widget.template_name = "daisy_forms/widgets/checkbox_select.html"
-            widget_any = cast(Any, widget)
-            widget_any.option_template_name = "daisy_forms/widgets/checkbox_option.html"
-        elif widget.template_name == "django/forms/widgets/clearable_file_input.html":
-            widget.template_name = "daisy_forms/widgets/clearable_file_input.html"
+        daisy_templates = _DAISY_TEMPLATES.get(widget.template_name or "")
+        if daisy_templates is not None:
+            stock_option, widget.template_name, option_template = daisy_templates
+            current_option = getattr(widget, "option_template_name", None)
+            if option_template and current_option == stock_option:
+                cast(Any, widget).option_template_name = option_template
         merged_attrs = cast(dict[str, str | bool], dict(attrs or {}))
-        for key, value in getattr(self, "extra_attrs", {}).items():
-            if key == "class" and merged_attrs.get("class"):
-                merged_attrs["class"] = f"{merged_attrs['class']} {value}"
-            else:
-                merged_attrs[key] = value
+        for key, value in self.extra_attrs.items():
+            merged_attrs[key] = (
+                merge_class(cast(str | None, merged_attrs.get("class")), value)
+                if key == "class"
+                else value
+            )
         return super().as_widget(widget, merged_attrs, only_initial)

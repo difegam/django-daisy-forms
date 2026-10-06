@@ -25,7 +25,20 @@ def test_daisy_field_tag_adds_attributes_without_mutating_form() -> None:
 
 
 @pytest.mark.parametrize(
-    "attribute", ["onclick", "onfocus", "aria-invalid", "aria-describedby"]
+    "attribute",
+    [
+        "onclick",
+        "onfocus",
+        "aria-invalid",
+        "aria-describedby",
+        "ARIA-DESCRIBEDBY",
+        "Aria-Invalid",
+        "hx-on:click",
+        "hx-on::after-request",
+        "x-on:click",
+        "x-init",
+        "data-hx-on:click",
+    ],
 )
 def test_daisy_field_tag_rejects_unsafe_or_authoritative_attributes(
     attribute: str,
@@ -35,6 +48,24 @@ def test_daisy_field_tag_rejects_unsafe_or_authoritative_attributes(
             "{% load daisy_forms %}{% daisy_field form.email "
             f'{attribute}="value" %}}'
         )
+
+
+@pytest.mark.parametrize("attribute", ["hx-post", "hx-trigger", "x-data", "data-id"])
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_daisy_field_tag_accepts_safe_passthrough_attributes(attribute: str) -> None:
+    output = Template(
+        f'{{% load daisy_forms %}}{{% daisy_field form.email {attribute}="v" %}}'
+    ).render(Context({"form": TagForm()}))
+
+    assert f'{attribute}="v"' in output
+
+
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_daisy_field_tag_reports_unresolved_field_as_value_error() -> None:
+    template = Template("{% load daisy_forms %}{% daisy_field form.emial %}")
+
+    with pytest.raises(ValueError, match="bound field"):
+        template.render(Context({"form": TagForm()}))
 
 
 class OptOutForm(forms.Form):

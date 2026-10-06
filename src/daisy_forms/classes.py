@@ -85,17 +85,7 @@ def all_classes() -> frozenset[str]:
     """Return every class emitted by the package templates and renderer."""
 
     classes = set(LAYOUT_CLASSES)
-    for base_class in WIDGET_CLASSES.values():
+    for base_class in (*WIDGET_CLASSES.values(), *INPUT_TYPE_CLASSES.values()):
         if base_class:
-            classes.add(base_class)
-            classes.add(f"{base_class}-error")
-    classes.update(
-        {"radio", "radio-error", "checkbox-error", "toggle-error"}
-        | {
-            f"{name}{suffix}"
-            for name in INPUT_TYPE_CLASSES.values()
-            if name
-            for suffix in ("", "-error")
-        }
-    )
+            classes.update((base_class, f"{base_class}-error"))
     return frozenset(classes)

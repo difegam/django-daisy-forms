@@ -3,8 +3,10 @@ import tarfile
 from pathlib import Path
 from zipfile import ZipFile
 
+from django.conf import LazySettings
 
-def test_django_uses_project_test_settings(settings) -> None:
+
+def test_django_uses_project_test_settings(settings: LazySettings) -> None:
     assert settings.ROOT_URLCONF == "tests.urls"
 
 

@@ -10,3 +10,10 @@ def test_type_configuration_uses_django_stubs() -> None:
         configuration["tool"]["django-stubs"]["django_settings_module"]
         == "tests.settings"
     )
+
+
+def test_ci_declares_each_supported_django_series() -> None:
+    workflow = Path(".github/workflows/ci.yml").read_text()
+
+    for version in ("5.2", "6.0", "6.1"):
+        assert f'"{version}"' in workflow

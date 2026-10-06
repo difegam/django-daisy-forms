@@ -53,9 +53,28 @@ LAYOUT_CLASSES: Final[frozenset[str]] = frozenset(
 )
 
 
-def daisy_class_for(widget: Widget) -> str | None:
-    """Return the first registered class for a widget's method-resolution order."""
+INPUT_TYPE_CLASSES: Final[Mapping[str, str | None]] = {
+    "range": "range",
+    "color": None,
+}
 
+
+def daisy_class_for(widget: Widget, input_type: str | None = None) -> str | None:
+    """Return the first registered class for a widget's method-resolution order.
+
+    daisyUI styles some input types with their own component class, so the
+    effective ``type`` (the rendered attribute, then the widget's) wins first.
+    """
+
+    effective_type = (
+        input_type or widget.attrs.get("type") or getattr(widget, "input_type", None)
+    )
+    if (
+        isinstance(widget, Input)
+        and effective_type is not None
+        and effective_type in INPUT_TYPE_CLASSES
+    ):
+        return INPUT_TYPE_CLASSES[effective_type]
     for widget_type in type(widget).__mro__:
         if widget_type in WIDGET_CLASSES:
             return WIDGET_CLASSES[widget_type]
@@ -70,5 +89,13 @@ def all_classes() -> frozenset[str]:
         if base_class:
             classes.add(base_class)
             classes.add(f"{base_class}-error")
-    classes.update({"radio", "radio-error", "checkbox-error", "toggle-error"})
+    classes.update(
+        {"radio", "radio-error", "checkbox-error", "toggle-error"}
+        | {
+            f"{name}{suffix}"
+            for name in INPUT_TYPE_CLASSES.values()
+            if name
+            for suffix in ("", "-error")
+        }
+    )
     return frozenset(classes)

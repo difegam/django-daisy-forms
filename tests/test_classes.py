@@ -17,3 +17,7 @@ def test_registry_covers_literal_template_classes() -> None:
 
 def test_widget_registry_uses_mro_specificity() -> None:
     assert daisy_class_for(Toggle()) == "toggle"
+
+
+def test_range_classes_are_in_the_safelist() -> None:
+    assert {"range", "range-error"} <= all_classes()

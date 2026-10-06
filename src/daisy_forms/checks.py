@@ -8,7 +8,7 @@ from django.core import checks
 from django.utils.module_loading import import_string
 
 
-@checks.register(checks.Tags.models)
+@checks.register(checks.Tags.templates)
 def check_daisy_forms_configuration(
     app_configs: Sequence[AppConfig] | None = None, **kwargs: object
 ) -> list[checks.CheckMessage]:

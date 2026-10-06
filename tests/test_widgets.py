@@ -42,3 +42,50 @@ def test_native_widgets_define_explicit_formats() -> None:
     assert NativeDateInput().format == "%Y-%m-%d"
     assert NativeDateTimeInput().format == "%Y-%m-%dT%H:%M"
     assert NativeTimeInput().format == "%H:%M"
+
+
+class FileForm(forms.Form):
+    attachment = forms.FileField(required=False)
+
+
+class _StoredFile:
+    name = "report.pdf"
+    url = "/media/report.pdf"
+
+    def __str__(self) -> str:
+        return self.name
+
+
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_clearable_file_input_omits_change_prefix_without_initial_file() -> None:
+    output = Template("{{ form }}").render(Context({"form": FileForm()}))
+
+    assert "Change:" not in output
+    assert 'class="file-input w-full"' in output
+
+
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_clearable_file_input_shows_current_file_and_change_prefix() -> None:
+    form = FileForm(initial={"attachment": _StoredFile()})
+
+    output = Template("{{ form }}").render(Context({"form": form}))
+
+    assert 'href="/media/report.pdf"' in output
+    assert "Change:" in output
+    assert 'class="checkbox"' in output
+
+
+class TypedInputForm(forms.Form):
+    level = forms.IntegerField(widget=forms.NumberInput(attrs={"type": "range"}))
+    tint = forms.CharField(widget=forms.TextInput(attrs={"type": "color"}))
+
+
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_range_input_uses_range_class_and_color_input_is_unstyled() -> None:
+    output = Template("{{ form }}").render(Context({"form": TypedInputForm(data={})}))
+
+    assert 'type="range"' in output
+    assert 'class="range range-error"' in output
+    assert 'type="color"' in output
+    assert 'type="color" name="tint"' in output
+    assert "input input-error" not in output

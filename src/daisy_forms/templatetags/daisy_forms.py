@@ -7,7 +7,6 @@ import re
 from dataclasses import dataclass
 
 from django import template
-from django.core.exceptions import FieldError
 from django.template import TemplateSyntaxError
 from django.template.base import FilterExpression, Parser, Token
 
@@ -28,7 +27,11 @@ class DaisyFieldNode(template.Node):
     def render(self, context: template.Context) -> str:
         bound_field = self.field.resolve(context)
         if not isinstance(bound_field, DaisyBoundField):
-            raise FieldError("daisy_field requires a Django BoundField")
+            raise TemplateSyntaxError(
+                "{% daisy_field %} cannot be used on a field that opts out of "
+                "DaisyBoundField (a plain BoundField opts out); render it with "
+                "{{ field }} instead."
+            )
 
         clone = copy.copy(bound_field)
         clone.extra_attrs = dict(getattr(bound_field, "extra_attrs", {}))

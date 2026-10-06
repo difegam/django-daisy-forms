@@ -35,3 +35,16 @@ def test_daisy_field_tag_rejects_unsafe_or_authoritative_attributes(
             "{% load daisy_forms %}{% daisy_field form.email "
             f'{attribute}="value" %}}'
         )
+
+
+class OptOutForm(forms.Form):
+    plain = forms.CharField()
+    plain.bound_field_class = forms.BoundField
+
+
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_daisy_field_tag_explains_opt_out_fields_are_unsupported() -> None:
+    template = Template("{% load daisy_forms %}{% daisy_field form.plain %}")
+
+    with pytest.raises(TemplateSyntaxError, match="opts out"):
+        template.render(Context({"form": OptOutForm()}))

@@ -27,3 +27,7 @@ def test_system_checks_accept_valid_configuration() -> None:
         for message in messages
         if message.id is not None and message.id.startswith("daisy_forms.")
     ]
+
+
+def test_configuration_check_runs_with_the_templates_tag() -> None:
+    assert "templates" in getattr(check_daisy_forms_configuration, "tags", ())

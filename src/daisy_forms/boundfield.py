@@ -45,7 +45,7 @@ class DaisyBoundField(BoundField):
         built = super().build_widget_attrs(attrs, widget)
         if not _uses_stock_template(widget):
             return built
-        base_class = daisy_class_for(widget)
+        base_class = daisy_class_for(widget, str(built.get("type") or "") or None)
         if base_class is None or widget.is_hidden:
             return built
 

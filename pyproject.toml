@@ -1,0 +1,60 @@
+[project]
+name = "django-daisy-forms"
+version = "0.1.0"
+description = "Django-native daisyUI form rendering"
+readme = "README.md"
+authors = [
+    { name = "Diego Gamboa", email = "difegam3@gmail.com" }
+]
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Framework :: Django",
+    "Framework :: Django :: 5.2",
+    "Framework :: Django :: 6.0",
+    "Framework :: Django :: 6.1",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+keywords = ["daisyui", "django", "forms", "tailwind"]
+dependencies = ["Django>=5.2"]
+
+[project.urls]
+Documentation = "https://github.com/difegam/django-daisy-forms#readme"
+Issues = "https://github.com/difegam/django-daisy-forms/issues"
+Source = "https://github.com/difegam/django-daisy-forms"
+
+[dependency-groups]
+test = [
+    "pytest>=8.4",
+    "pytest-cov>=7.0",
+    "pytest-django>=4.11",
+]
+lint = ["prek>=0.4", "ruff>=0.14"]
+type = [
+    "django-stubs-ext>=5.2",
+    "django-stubs[compatible-mypy]>=5.2",
+    "mypy>=1.18",
+]
+dev = [
+    { include-group = "test" },
+    { include-group = "lint" },
+    { include-group = "type" },
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "tests.settings"
+pythonpath = [".", "src"]
+testpaths = ["tests"]
+
+[build-system]
+requires = ["uv_build>=0.12.18,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "daisy_forms"

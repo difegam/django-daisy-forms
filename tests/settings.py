@@ -1,7 +1,11 @@
 SECRET_KEY = "django-daisy-forms-test-key"
 
 INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
     "django.contrib.contenttypes",
+    "django.contrib.messages",
+    "django.contrib.sessions",
     "django.forms",
     "daisy_forms",
 ]
@@ -18,3 +22,4 @@ TEMPLATES = [
 ]
 
 USE_TZ = True
+FORM_RENDERER = "daisy_forms.renderers.DaisyFormRenderer"

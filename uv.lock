@@ -236,7 +236,7 @@ type = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "django", specifier = ">=5.2" }]
+requires-dist = [{ name = "django", specifier = ">=5.2,<2029" }]
 
 [package.metadata.requires-dev]
 dev = [

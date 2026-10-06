@@ -16,3 +16,8 @@ wheels/
 .ruff_cache/
 coverage.xml
 htmlcov/
+
+# Tailwind verification output
+tests/tailwind/node_modules/
+tests/tailwind/daisy-forms.css
+tests/tailwind/output.css

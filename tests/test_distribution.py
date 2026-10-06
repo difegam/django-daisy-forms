@@ -15,6 +15,13 @@ def test_wheel_contains_typed_package(dist_path: Path) -> None:
         assert any(name.endswith("daisy_forms/py.typed") for name in archive.namelist())
 
 
+def test_wheel_contains_renderer_templates(dist_path: Path) -> None:
+    with ZipFile(next(dist_path.glob("*.whl"))) as archive:
+        names = archive.namelist()
+        assert "daisy_forms/templates/daisy_forms/form.html" in names
+        assert "daisy_forms/templates/daisy_forms/widgets/radio.html" in names
+
+
 def test_source_distribution_contains_typed_package(dist_path: Path) -> None:
     with tarfile.open(next(dist_path.glob("*.tar.gz"))) as archive:
         assert any(name.endswith("daisy_forms/py.typed") for name in archive.getnames())

@@ -22,7 +22,7 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 keywords = ["daisyui", "django", "forms", "tailwind"]
-dependencies = ["Django>=5.2"]
+dependencies = ["Django>=5.2,<2029"]
 
 [project.urls]
 Documentation = "https://github.com/difegam/django-daisy-forms#readme"

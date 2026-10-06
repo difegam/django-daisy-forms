@@ -1,0 +1,37 @@
+import pytest
+from django import forms
+from django.template import Context, Template, TemplateSyntaxError
+from django.test import override_settings
+
+
+class TagForm(forms.Form):
+    email = forms.EmailField()
+
+
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_daisy_field_tag_adds_attributes_without_mutating_form() -> None:
+    form = TagForm()
+    original_attrs = dict(form.fields["email"].widget.attrs)
+
+    output = Template(
+        '{% load daisy_forms %}{% daisy_field form.email class+="input-sm" '
+        'hx-post="/validate/email/" label="Work email" %}'
+    ).render(Context({"form": form}))
+
+    assert 'class="input input-sm w-full"' in output
+    assert 'hx-post="/validate/email/"' in output
+    assert "Work email" in output
+    assert form.fields["email"].widget.attrs == original_attrs
+
+
+@pytest.mark.parametrize(
+    "attribute", ["onclick", "onfocus", "aria-invalid", "aria-describedby"]
+)
+def test_daisy_field_tag_rejects_unsafe_or_authoritative_attributes(
+    attribute: str,
+) -> None:
+    with pytest.raises(TemplateSyntaxError):
+        Template(
+            "{% load daisy_forms %}{% daisy_field form.email "
+            f'{attribute}="value" %}}'
+        )

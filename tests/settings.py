@@ -1,4 +1,7 @@
+from pathlib import Path
+
 SECRET_KEY = "django-daisy-forms-test-key"
+TESTS_DIR = Path(__file__).parent
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -16,7 +19,7 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "APP_DIRS": True,
-        "DIRS": [],
+        "DIRS": [TESTS_DIR / "templates"],
         "OPTIONS": {"context_processors": []},
     }
 ]

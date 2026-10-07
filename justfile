@@ -12,7 +12,7 @@ typecheck:
     uv run mypy --strict src/daisy_forms tests
 
 test:
-    uv run pytest
+    uv run pytest --cov
 
 css-check:
     PYTHONPATH=. uv run django-admin daisy_forms_css --settings=tests.settings --skip-checks --output tests/tailwind/daisy-forms.css

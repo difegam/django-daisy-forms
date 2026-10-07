@@ -22,7 +22,7 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 keywords = ["daisyui", "django", "forms", "tailwind"]
-dependencies = ["Django>=5.2,<2029"]
+dependencies = ["Django>=5.2,<6.2"]
 
 [project.urls]
 Documentation = "https://github.com/difegam/django-daisy-forms#readme"
@@ -51,6 +51,14 @@ dev = [
 DJANGO_SETTINGS_MODULE = "tests.settings"
 pythonpath = [".", "src"]
 testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["daisy_forms"]
+
+[tool.coverage.report]
+fail_under = 94
+show_missing = true
 
 [tool.ruff]
 line-length = 88

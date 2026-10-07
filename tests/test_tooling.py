@@ -1,6 +1,8 @@
 import tomllib
 from pathlib import Path
 
+from packaging.requirements import Requirement
+
 
 def test_type_configuration_uses_django_stubs() -> None:
     configuration = tomllib.loads(Path("pyproject.toml").read_text())
@@ -10,6 +12,14 @@ def test_type_configuration_uses_django_stubs() -> None:
         configuration["tool"]["django-stubs"]["django_settings_module"]
         == "tests.settings"
     )
+
+
+def test_django_dependency_excludes_unverified_releases() -> None:
+    configuration = tomllib.loads(Path("pyproject.toml").read_text())
+    requirement = Requirement(configuration["project"]["dependencies"][0])
+
+    assert "6.1" in requirement.specifier
+    assert "6.2" not in requirement.specifier
 
 
 def test_ci_declares_each_supported_django_series() -> None:

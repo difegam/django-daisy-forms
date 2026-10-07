@@ -17,6 +17,14 @@ class StyledForm(forms.Form):
     accepted = forms.BooleanField()
 
 
+class CustomCheckboxInput(forms.CheckboxInput):
+    pass
+
+
+class CustomCheckboxForm(forms.Form):
+    accepted = forms.BooleanField(widget=CustomCheckboxInput)
+
+
 class ChoiceForm(forms.Form):
     plan = forms.ChoiceField(
         choices=[("basic", "Basic"), ("pro", "Pro")],
@@ -26,6 +34,10 @@ class ChoiceForm(forms.Form):
     features = forms.MultipleChoiceField(
         choices=[("a", "A"), ("b", "B")],
         widget=forms.CheckboxSelectMultiple,
+    )
+    categories = forms.MultipleChoiceField(
+        choices=[("a", "A"), ("b", "B")],
+        widget=forms.SelectMultiple,
     )
 
 
@@ -76,8 +88,11 @@ def test_choice_widgets_render_daisy_classes_and_fieldset_semantics() -> None:
 
     assert '<fieldset class="fieldset"' in output
     assert '<legend class="fieldset-legend">Plan' in output
+    assert '<fieldset class="fieldset" aria-describedby="id_features_error">' in output
+    assert '<legend class="fieldset-legend">Features' in output
     assert 'class="radio radio-error"' in output
     assert 'class="checkbox checkbox-error"' in output
+    assert 'class="select select-error w-full"' in output
     assert 'id="id_plan_helptext"' in output
     assert 'id="id_plan_error"' in output
 
@@ -88,6 +103,17 @@ def test_checkbox_fields_put_control_and_label_in_one_label() -> None:
 
     output = Template("{{ form.accepted.as_field_group }}").render(
         Context({"form": form})
+    )
+
+    assert '<label class="label" for="id_accepted">' in output
+    assert '<input type="checkbox"' in output
+    assert "Accepted" in output
+
+
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_checkbox_input_subclasses_keep_checkbox_field_group_markup() -> None:
+    output = Template("{{ form.accepted.as_field_group }}").render(
+        Context({"form": CustomCheckboxForm()})
     )
 
     assert '<label class="label" for="id_accepted">' in output
@@ -140,14 +166,21 @@ class CustomOptionForm(forms.Form):
 
 @override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
 def test_custom_option_templates_are_not_replaced() -> None:
-    form = CustomOptionForm()
+    output = Template("{{ form.plan }}{{ form.features }}").render(
+        Context({"form": CustomOptionForm()})
+    )
 
-    for name, option_template in (
-        ("plan", "custom/radio_option.html"),
-        ("features", "custom/checkbox_option.html"),
-    ):
-        with pytest.raises(TemplateDoesNotExist, match=option_template):
-            form[name].as_widget()
+    assert 'class="custom-radio-option"' in output
+    assert '<span class="custom-checkbox-option">A</span>' in output
+
+
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_custom_option_template_keeps_the_stock_outer_widget_template() -> None:
+    output = Template("{{ form.plan }}").render(Context({"form": CustomOptionForm()}))
+
+    assert 'class="custom-radio-option"' in output
+    assert 'class="flex flex-col gap-2"' not in output
+    assert 'data-input-class="radio"' not in output
 
 
 @override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")

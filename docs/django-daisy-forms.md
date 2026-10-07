@@ -32,7 +32,7 @@ The approach holds up, with one condition: a Django-native daisyUI 5 form render
 - **Django 5.0:** introduced field group templates, `BoundField.as_field_group()`, `BaseRenderer.field_template_name` (default `"django/forms/field.html"`) and `Field.template_name`. It also added `aria-describedby` linking help text and `aria-invalid="true"` on invalid fields (ticket #32820, fixed Aug 2023).\[16\]\[17\]\[18\]
 - **Django 5.1:** added `aria-describedby` for widgets rendered in a `<fieldset>` (radios, checkbox groups). The attribute goes on the `<fieldset>`, not on each input.\[19\]\[20\]
 - **Django 5.2 (LTS; djangoproject.com/download lists the latest release as 5.2.17, mainstream support ended December 3, 2025, and extended support runs to April 2028):** added `bound_field_class` at three levels: `BaseRenderer.bound_field_class` for the project, `Form.bound_field_class` per form, and `Field.bound_field_class` per field. Ticket #32819 (closed 2025-01-02) finished the error association.\[21\]\[22\] Django's source builds `aria-describedby` from `f"{self.auto_id}_helptext"` and `f"{self.auto_id}_error"`, in that order, and only when help text or errors exist.\[20\] It skips this when the widget is hidden, when `auto_id` is empty, when `aria-describedby` is already in `widget.attrs` or `as_widget(attrs=…)`, and when `widget.use_fieldset` is true. 5.2 also added the `BoundField.aria_describedby` property and `ErrorList(field_id=…)`, so the default error template can render `id="{{ field_id }}_error"`.
-- **Django 6.0:** added template partials, built-in CSP, and the Tasks framework. It removed the `DjangoDivFormRenderer`/`Jinja2DivFormRenderer` transitional renderers, and the `URLField` default scheme became `https`.\[23\]\[24\] Django ticket #36772 reported that file inputs lost `aria-describedby` in 6.0, because `ClearableFileInput.use_fieldset = True` trips the `not self.use_fieldset` guard. It was closed as "invalid" in Jan 2026 with the note "This issue was fixed by #36829", and the #36829 commit was backported to 6.0.x. However, that commit is titled "Reverted value of ClearableFileInput.use_fieldset to True", which conflicts with the ticket comment that `use_fieldset` "was reset to False", so the actual value on each version is a spike check.
+- **Django 6.0:** added template partials, built-in CSP, and the Tasks framework. It removed the `DjangoDivFormRenderer`/`Jinja2DivFormRenderer` transitional renderers, and the `URLField` default scheme became `https`.\[23\]\[24\] Django ticket #36772 reported that file inputs lost `aria-describedby` in 6.0, because `ClearableFileInput.use_fieldset = True` trips the `not self.use_fieldset` guard. It was closed as "invalid" in Jan 2026 with the note "This issue was fixed by #36829", and the #36829 commit was backported to 6.0.x. Verified by running Django 5.2.18, 6.0.9 and 6.1.2: `ClearableFileInput.use_fieldset` is `False` on all three, so file inputs keep `aria-describedby`. The attached #36829 patch also sets `use_fieldset = True` only on `AdminFileWidget`.
 - **Django 6.1 (released 2026-08-05):** admin forms now show help text "after the field label and before the field input" and validation errors "after the help text and before the field input", with checkboxes excepted. 6.1 also adds the `csp_nonce_attr` tag (which can render a `Media` object with nonces), CSP nonces on all built-in templates, an accessible translatable `BLANK_CHOICE_LABEL`, and calendar versioning, so Django 7.0 becomes "Django 2028".\[25\]
 - **No 6.x-only API would materially simplify the design.** Partials could merge the widget templates into one file, but that saves files, not concepts. Stay on the 5.2 floor.
 
@@ -95,7 +95,7 @@ The approach holds up, with one condition: a Django-native daisyUI 5 form render
 crispy compatibility, FormHelper, Layout DSL, Bootstrap or plain-Tailwind renderers, Alpine, JavaScript of any kind, client-side validation logic, themes, package-level settings, Pydantic, Jinja2 support, autocomplete, date pickers, dynamic formsets, multistep wizards.
 
 ## 3. Supported versions
-- Python ≥ 3.12. Django ≥ 5.2 (`Django>=5.2,<2029`). CI covers Django 5.2, 6.0 and 6.1 on Python 3.12, 3.13 and 3.14 where Django officially supports the combination.
+- Python ≥ 3.12. Django ≥ 5.2 (`Django>=5.2,<6.2`). CI covers Django 5.2, 6.0 and 6.1 on Python 3.12, 3.13 and 3.14 where Django officially supports the combination.
 - Tailwind CSS ≥ 4.1 (needed for `@source inline()`). daisyUI ≥ 5.0.36 (aria-invalid fixes).
 - MUST NOT use any Django API newer than 5.2. In particular, package templates MUST NOT use `{% partialdef %}`.
 
@@ -127,7 +127,8 @@ No other public attributes in P0. Users customize by subclassing it.
 - Other `extra_attrs` keys override widget attrs. The keys `aria-invalid` and `aria-describedby` from tag kwargs are rejected.
 - `as_widget(widget=None, attrs=None, only_initial=False)` MUST swap in the package template only on a `copy.copy(widget)`, and only when the widget's `template_name`/`option_template_name` equal the stock value of its nearest registered Django base class.
 - Instance attributes: `extra_attrs: dict[str, str]` (default empty) and `template_override: str | None`. These are set only on copies made by the tag.
-- Escape hatch (documented): set `Field.bound_field_class = forms.BoundField` to opt a field out.
+- A blank `template_override` MUST raise `TemplateDoesNotExist` before Django's template loader runs.
+- Escape hatch (documented): set `Field.bound_field_class = forms.BoundField` to opt a field out. An opted-out field cannot be passed to `{% daisy_field %}`, which raises `TemplateSyntaxError`; render it with `{{ field }}` instead.
 
 ### 4.4 Class registry (`daisy_forms/classes.py`)
 ```python
@@ -157,8 +158,9 @@ Stock `DateInput` and the other stock widgets keep Django's defaults (`type="tex
 {% daisy_field form.bio template="daisy_forms/field_horizontal.html" %}
 ```
 - Grammar: `{% daisy_field <bound_field> (<name>(=|+=)<expr>)* %}`. Names match `^[A-Za-z_][A-Za-z0-9_:.\-]*$`. Values are template expressions.
-- Reserved names: `label` (overrides the label text on a copy) and `template` (field group template). Every other name becomes a widget attribute. `class=` and `class+=` both **append** to daisy classes.
-- MUST raise `TemplateSyntaxError` for names starting with `on` (case-insensitive) and for `aria-invalid`/`aria-describedby`.
+- Reserved names: `label` (overrides the label text on a copy) and `template` (field group template). Every other name becomes a widget attribute. `class=` and `class+=` both **append** to daisy classes; `+=` is accepted for parity with django-widget-tweaks and is rejected on any other name.
+- MUST raise `TemplateSyntaxError` (case-insensitively) for inline-handler names (`on*`, `hx-on*`, `x-on*`, `x-init`, with an optional `data-` prefix) and for `aria-invalid`/`aria-describedby`.
+- MUST raise `ValueError` at render time when the argument does not resolve to a bound field (for example a mistyped field name).
 - Renders `copy.copy(bf)` with overrides through `as_field_group()` (or the template override). It never mutates the form.
 
 ### 4.7 Management command
@@ -176,6 +178,7 @@ Users override these by placing same-named files in their project `TEMPLATES["DI
 - `daisy_forms/form.html`
 - `daisy_forms/formset.html`
 - `daisy_forms/field.html`
+- `daisy_forms/_field_meta.html` (help text and errors, included by `field.html`; a custom `field.html` must ship or replace it)
 - `daisy_forms/field_horizontal.html` (P1)
 - `daisy_forms/widgets/radio.html`, `radio_option.html`, `checkbox_select.html`, `checkbox_option.html`, `clearable_file_input.html`
 
@@ -184,7 +187,7 @@ Template names are public API, and renames are breaking changes.
 ## 5. Markup contract (daisyUI 5)
 
 Rules that apply to every field:
-- The wrapper is `<div class="fieldset">` for single controls and `<fieldset class="fieldset">` + `<legend class="fieldset-legend">` when `field.use_fieldset` (RadioSelect, CheckboxSelectMultiple, and ClearableFileInput where Django sets it).
+- The wrapper is `<div class="fieldset">` for single controls and `<fieldset class="fieldset">` + `<legend class="fieldset-legend">` when `field.use_fieldset` (RadioSelect and CheckboxSelectMultiple; `ClearableFileInput` is `False` on 5.2, 6.0 and 6.1, but the template reads `field.use_fieldset`, so it follows Django).
 - The `<fieldset>` gets `aria-describedby="{{ field.aria_describedby }}"` when that value is non-empty, which mirrors Django.\[20\]
 - Help text is `<p class="label" id="{auto_id}_helptext">` and is rendered whenever `help_text` is set. Django references that id even if a template omits it.\[43\]
 - Errors are `<ul class="text-error text-sm" id="{auto_id}_error">` with one `<li>` per error, rendered whenever errors exist.\[44\]
@@ -240,7 +243,7 @@ The default state is the same without `input-error`, `aria-invalid` and the `<ul
 ## 7. Security requirements
 1. Package templates MUST NOT use `|safe`, `{% autoescape off %}` or `mark_safe` on labels, help text, errors, choice labels, values or attrs. Help text is escaped unless the developer passed a `SafeString`.
 2. Attributes are emitted only through Django's widget attrs rendering (escaped). Python code MUST use `format_html` and never f-string HTML.
-3. The tag rejects `on*` event-handler attributes. The package ships no inline `<script>` or `style=`, so it is CSP-neutral under Django 6.0+ CSP.
+3. The tag rejects `on*`, `hx-on*`, `x-on*` and `x-init` inline-handler attributes. The package ships no inline `<script>` or `style=`, so it is CSP-neutral under Django 6.0+ CSP.
 4. An XSS test suite injects `<script>`, `"><img onerror>` and quote characters into labels, help text, choices, errors, initial values and tag values, and asserts the output is escaped.
 
 ## 8. Project layout (uv, src layout)
@@ -259,7 +262,7 @@ noxfile.py → NOT used; matrix lives in CI via `uv run --with "django~=X.Y"`
 Tooling: `uv sync`, `uv run pytest`, `uv run mypy --strict src` (django-stubs plugin), `uv run ruff check && ruff format --check`, `uv build`. Bash scripts only in `scripts/` (e.g. `scripts/tailwind-check.sh`).
 
 ## 9. Testing & CI contract
-- **Unit/golden:** pytest + pytest-django. Each P0 widget is tested in four states ({default, error, disabled, help}) against a golden file using `assertHTMLEqual`. Golden files are the markup contract in §5.
+- **Unit/golden:** pytest + pytest-django. Scalar, checkbox, grouped-choice and clearable-file fields are compared with canonical golden HTML using `assertHTMLEqual`; specialised tests cover widget classes, error states, disabled fields and attribute handling. Golden files are the markup contract in §5.
 - **A11y invariants (programmatic):** for every rendered field, each id in `aria-describedby` exists in the output; invalid visible controls carry `aria-invalid="true"`; every visible control has a `<label for>` or sits inside a `<fieldset>` with a `<legend>`.
 - **Registry test:** the template-class scan is a subset of `all_classes()` (§6.1).
 - **CSS job:** install `tailwindcss`, `@tailwindcss/cli` and `daisyui@5` via npm. Build `tests/tailwind/input.css` (imports the generated file and has no `@source` to site-packages). Assert compiled CSS contains a selector for every class in `all_classes()`.
@@ -280,7 +283,7 @@ Tooling: `uv sync`, `uv run pytest`, `uv run mypy --strict src` (django-stubs pl
 - **Spike (≤ 3 days):**
   - Scope: renderer, BoundField, `field.html`, `form.html`, and text, select, textarea, checkbox and radio on Django 5.2 and 6.1.
   - Golden tests and the CSS job.
-  - Verify: admin impact; `select[multiple]` styling; `ClearableFileInput` `use_fieldset` behaviour on 5.2 vs 6.x; whether daisyUI emits component CSS without detection; `@source inline()` inside an imported file.
+  - Verify: admin impact; `select[multiple]` styling; whether daisyUI emits component CSS without detection; `@source inline()` inside an imported file.
 - **P0 (0.1.0):** all §5 widgets, formsets, the tag, the widgets module, the command, checks, docs and full CI.
 - **P1 (0.2.x):**
   - `field_horizontal.html`;
@@ -299,7 +302,7 @@ Stop building and contribute a daisyUI 5 template pack to an existing crispy pac
 
 ## Caveats
 - PyPI name availability for `django-daisy-forms`, `daisy-forms`, `django-daisyui-forms`, `django-daisyforms` and `daisyforms` could not be confirmed: none turned up in searches, but no direct 404 check was done. Run `curl -sf https://pypi.org/pypi/<name>/json` before committing. PyPI treats `-`, `_` and `.` as equivalent and may reject names that are too similar to existing ones.
-- Whether daisyUI 5 emits component CSS for undetected classes and how daisyUI styles `select[multiple]` are not verified. Django ticket #36772 (file input `aria-describedby` in 6.0) was closed as "invalid" because it was fixed by #36829, which was backported to 6.0.x. The #36829 commit title and the ticket comment disagree on the final `ClearableFileInput.use_fieldset` value, though. Each of these is an explicit spike check, not an assumption.
+- Whether daisyUI 5 emits component CSS for undetected classes and how daisyUI styles `select[multiple]` are not verified. Each of these is an explicit spike check, not an assumption. Django ticket #36772 (file input `aria-describedby` in 6.0) is resolved: #36829 restored `ClearableFileInput.use_fieldset = False`, confirmed on 5.2.18, 6.0.9 and 6.1.2.
 - The renderer-level `bound_field_class` also applies to Django admin forms. The expected effect is extra, unstyled class tokens, because admin does not load daisyUI CSS. This is a spike verification item with a defined fallback (§11d).
 - django-formset's current status was not re-verified. The star counts come from djangopackages snapshots and are approximate.
 

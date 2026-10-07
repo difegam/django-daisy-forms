@@ -9,6 +9,7 @@ from typing import Any, Final, cast
 
 from django.forms.boundfield import BoundField
 from django.forms.widgets import Widget
+from django.template import TemplateDoesNotExist
 from django.utils.safestring import SafeString
 
 from .classes import WIDGET_CLASSES, daisy_class_for
@@ -43,6 +44,9 @@ def _uses_stock_template(widget: Widget) -> bool:
     template_name = widget.template_name or ""
     if template_name.startswith("daisy_forms/"):
         return True
+    if template_name in _DAISY_TEMPLATES:
+        stock_option, _, _ = _DAISY_TEMPLATES[template_name]
+        return getattr(widget, "option_template_name", None) == stock_option
     if type(widget).__module__ == "django.forms.widgets":
         return True
     for widget_type in type(widget).__mro__:
@@ -61,6 +65,10 @@ class DaisyBoundField(BoundField):
     @property
     def template_name(self) -> str:
         if self.template_override is not None:
+            if not self.template_override.strip():
+                raise TemplateDoesNotExist(
+                    "Daisy field template overrides cannot be blank."
+                )
             return self.template_override
         return super().template_name
 
@@ -101,10 +109,12 @@ class DaisyBoundField(BoundField):
         widget = copy.copy(widget or self.field.widget)
         daisy_templates = _DAISY_TEMPLATES.get(widget.template_name or "")
         if daisy_templates is not None:
-            stock_option, widget.template_name, option_template = daisy_templates
+            stock_option, daisy_template, option_template = daisy_templates
             current_option = getattr(widget, "option_template_name", None)
-            if option_template and current_option == stock_option:
-                cast(Any, widget).option_template_name = option_template
+            if current_option == stock_option:
+                widget.template_name = daisy_template
+                if option_template:
+                    cast(Any, widget).option_template_name = option_template
         merged_attrs = cast(dict[str, str | bool], dict(attrs or {}))
         for key, value in self.extra_attrs.items():
             merged_attrs[key] = (

@@ -61,7 +61,7 @@ update:
 
 [doc("Draft the changelog entry, version bump and release notes with Claude")]
 release-notes *args:
-    scripts/release-notes.sh {{args}}
+    scripts/release-notes.sh {{ args }}
 
 [doc("Bump the package patch version with uv")]
 bump-patch:
@@ -77,18 +77,23 @@ bump-major:
 
 [doc("Run every local check that CI runs")]
 [group("ci")]
-verify: check css-check build doc-build doc-format-check
+verify: check css-check build doc-build doc-llms doc-format-check
 
 # Documentation
 [doc("Preview documentation locally")]
 [group("docs")]
 doc-serve:
-    uv run --group docs zensical serve
+    uv run --group docs zensical serve -a localhost:1031
 
 [doc("Build documentation (fail on warnings)")]
 [group("docs")]
 doc-build:
     uv run --group docs zensical build --clean --strict
+
+[doc("Generate llms.txt into the built site (run after doc-build)")]
+[group("docs")]
+doc-llms *args:
+    scripts/llms-txt.sh {{ args }}
 
 [doc("Format documentation markdown files")]
 [group("docs")]

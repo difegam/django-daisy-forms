@@ -89,4 +89,4 @@ doc-build:
 [doc("Format documentation markdown files")]
 [group("docs")]
 doc-format:
-    uvx --with mdformat-frontmatter --with mdformat-gfm --with mdformat-mkdocs mdformat docs
+    uvx --with mdformat-gfm --with mdformat-front-matters --with mdformat-footnote --with mdformat-mkdocs mdformat --number docs

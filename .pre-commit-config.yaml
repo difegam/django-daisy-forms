@@ -65,10 +65,14 @@ repos:
       - id: mdformat
         name: format Markdown
         types: [markdown]
-        # Rewrites list indentation and card separators; run on demand with `just doc-format`.
+        files: ^docs/
+        args: [--number]
+        # Same plugins as `just doc-format`. Avoid mdformat-web and mdformat-ruff,
+        # which rewrite the HTML and Python examples. Runs on demand only.
         stages: [manual]
         additional_dependencies:
-          - mdformat-frontmatter
+          - mdformat-footnote
+          - mdformat-front-matters
           - mdformat-gfm
           - mdformat-mkdocs
 

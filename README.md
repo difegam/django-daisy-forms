@@ -21,6 +21,7 @@
   <img alt="Tailwind CSS 4.1+" src="https://img.shields.io/badge/tailwind-4.1%2B-38BDF8">
   <a href="https://difegam.github.io/django-daisy-forms/"><img alt="Documentation" src="https://img.shields.io/badge/docs-difegam.github.io-4F46E5"></a>
   <a href="https://github.com/difegam/django-daisy-forms/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/difegam/django-daisy-forms/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://deepwiki.com/difegam/django-daisy-forms"><img alt="Ask DeepWiki" src="https://deepwiki.com/badge.svg"></a>
   <a href="https://github.com/difegam/django-daisy-forms/blob/main/LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/license-MIT-9B8CFF"></a>
 </p>
 

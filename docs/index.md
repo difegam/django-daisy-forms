@@ -13,6 +13,7 @@ Render daisyUI 5 markup from Django's own form renderer and `BoundField` APIs. P
     <img alt="Django 5.2 | 6.0 | 6.1" src="https://img.shields.io/badge/django-5.2%20%7C%206.0%20%7C%206.1-0C4B33">
     <img alt="daisyUI 5" src="https://img.shields.io/badge/daisyUI-5-FFC94A">
     <img alt="Tailwind CSS 4.1+" src="https://img.shields.io/badge/tailwind-4.1%2B-38BDF8">
+    <a href="https://deepwiki.com/difegam/django-daisy-forms"><img alt="Ask DeepWiki" src="https://deepwiki.com/badge.svg"></a>
     <a href="https://github.com/difegam/django-daisy-forms/blob/main/LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/license-MIT-9B8CFF"></a>
 </p>
 

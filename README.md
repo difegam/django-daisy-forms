@@ -260,6 +260,7 @@ just css-check  Build the Tailwind and daisyUI fixture.
 just css-preview  Build the fixture CSS for the browser preview.
 just check      Run formatting, linting, type checks, and tests.
 just build      Build wheel and source-distribution artifacts.
+just release-notes  Draft the next release's changelog and notes with Claude.
 
 just browser-setup    Install Playwright, Chromium, and the browser CLI.
 just browser-test     Run the opt-in browser checks for form layouts.
@@ -289,10 +290,19 @@ tests them in isolated environments.
 <details>
 <summary><strong>Releasing</strong></summary>
 
-Choose the release level and run `just bump-patch`, `just bump-minor`, or
-`just bump-major`. These recipes use `uv version --bump` to update the package
-version and lockfile. Review and commit the changes, merge them to `main`, then
-push a matching semantic version tag such as `v0.1.0`.
+Run `just release-notes` to draft the release with the
+[Claude Code](https://docs.claude.com/en/docs/claude-code) CLI. The script
+collects the commits, diffs, and CHANGELOG sections since the latest tag, then
+runs `claude -p` with all tools disabled. It writes a suggested version bump, a
+CHANGELOG entry, and GitHub release notes to `.release/release.md`. Pass
+`--dry-run` to write only the context and prompt, or `--from`/`--to` to choose
+the range.
+
+Review the draft, add its entries to CHANGELOG.md under a
+`## [X.Y.Z] - YYYY-MM-DD` heading, and update the link references. Then run
+`just bump-patch`, `just bump-minor`, or `just bump-major` to update the
+package version and lockfile. Merge the changes to `main` through a pull
+request, then push a matching semantic version tag such as `v0.1.1`.
 
 The release workflow checks that the tag matches the package version, rebuilds
 and smoke-tests the wheel and source distribution, adds provenance attestations,

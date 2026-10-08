@@ -48,6 +48,8 @@ class DaisyFieldNode(template.Node):
             value = "" if resolved is None else str(resolved)
             if name == "label":
                 clone.label = value
+            elif name == "label_class":
+                clone.label_class = value
             elif name == "template":
                 clone.template_override = value
             elif name == "choices":

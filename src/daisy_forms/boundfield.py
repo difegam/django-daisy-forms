@@ -96,6 +96,7 @@ class DaisyBoundField(BoundField):
     """A Django bound field that adds daisyUI classes without mutating widgets."""
 
     template_override: str | None = None
+    label_class: str | None = None
 
     extra_attrs: Mapping[str, str] = MappingProxyType({})
 

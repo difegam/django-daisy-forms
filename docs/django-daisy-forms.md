@@ -54,7 +54,7 @@ The approach holds up: a Django-native daisyUI 5 form renderer without crispy is
 | 2 | Per-widget classes | **BoundField class registry** (MRO lookup, dict in `classes.py`) applied in `build_widget_attrs`; no global widget-template overrides | Classes live in Python, so a safelist is mandatory (that is the point of the registry) |
 | 3 | Widget templates (radio, checkbox group, clearable file) | Swap `template_name`/`option_template_name` on a **copy** of the widget, only if the widget still uses Django's stock template | Third-party widgets with custom templates are untouched by design |
 | 4 | Third-party/custom widgets | Same guard: unknown widgets or customized templates get no daisy class and render inside the standard field wrapper | Custom widgets need an explicit `attrs={"class": …}` to be styled |
-| 5 | Template tags | **One tag**: `{% daisy_field bf [label=…] [template=…] [choices=inline] [prefix=…] [suffix=…] attr=value… %}` with widget-tweaks-style passthrough. Drop `{% render_form %}` (`{{ form }}` works) | Hyphenated attributes (`hx-post`) need a small custom kwarg parser |
+| 5 | Template tags | **One tag**: `{% daisy_field bf [label=…] [label_class=…] [template=…] [choices=inline] [prefix=…] [suffix=…] attr=value… %}` with widget-tweaks-style passthrough. Drop `{% render_form %}` (`{{ form }}` works) | Hyphenated attributes (`hx-post`) need a small custom kwarg parser |
 | 6 | Python per-field options | No new API: widget `attrs` (classes merge), `Field.template_name`, field-level `bound_field_class`, plus `daisy_forms.widgets` (Toggle, NativeDate/Time/DateTime) | Size and colour variants are spelled as daisyUI classes, not enums |
 | 7 | Configuration | **No package settings, no Pydantic.** Configure by subclassing the renderer (class attributes) | Less "magic"; teams that want a toggle subclass in 3 lines |
 | 8 | Error UX | Server errors only: `aria-invalid`, ids matching Django, `*-error` classes; `validator` opt-in | No live client feedback by default (use htmx per-field validation) |
@@ -126,7 +126,7 @@ No other public attributes in P0. Users customize by subclassing it.
   4. `extra_attrs["class"]` from the tag.
 - Other `extra_attrs` keys override widget attrs. The keys `aria-invalid` and `aria-describedby` from tag kwargs are rejected.
 - `as_widget(widget=None, attrs=None, only_initial=False)` MUST swap in the package template only on a `copy.copy(widget)`, and only when the widget's `template_name`/`option_template_name` equal the stock value of its nearest registered Django base class.
-- Instance attributes: `extra_attrs: dict[str, str]` (default empty), `template_override: str | None`, `choice_layout: str | None`, `prefix: str | None`, and `suffix: str | None`. These are set only on copies made by the tag.
+- Instance attributes: `extra_attrs: dict[str, str]` (default empty), `template_override: str | None`, `label_class: str | None`, `choice_layout: str | None`, `prefix: str | None`, and `suffix: str | None`. These are set only on copies made by the tag.
 - A blank `template_override` MUST raise `TemplateDoesNotExist` before Django's template loader runs.
 - Escape hatch (documented): set `Field.bound_field_class = forms.BoundField` to opt a field out. An opted-out field cannot be passed to `{% daisy_field %}`, which raises `TemplateSyntaxError`; render it with `{{ field }}` instead.
 
@@ -155,15 +155,17 @@ Stock `DateInput` and the other stock widgets keep Django's defaults (`type="tex
 ### 4.6 Template tag (`{% load daisy_forms %}`)
 ```django
 {% daisy_field form.email label="Work email" class="input-sm" hx-post="/validate/email/" hx-trigger="blur" %}
+{% daisy_field form.email label_class="text-primary" %}
 {% daisy_field form.bio template="daisy_forms/field_horizontal.html" %}
 {% daisy_field form.plan choices="inline" %}
 {% daisy_field form.price prefix="$" suffix="USD" %}
 ```
 - Grammar: `{% daisy_field <bound_field> (<name>(=|+=)<expr>)* %}`. Names match `^[A-Za-z_][A-Za-z0-9_:.\-]*$`. Values are template expressions.
-- Reserved names: `label` (overrides label text), `template` (field group template), `choices` (`inline` for stock `RadioSelect` and `CheckboxSelectMultiple`), and `prefix`/`suffix` (escaped text for stock widgets rendered with daisyUI's `input` component). Every other name becomes a widget attribute. `class=` and `class+=` both **append** to daisy classes; `+=` is accepted for parity with django-widget-tweaks and is rejected on any other name.
+- Reserved names: `label` (overrides label text), `label_class` (appends classes to the main label or choice-group legend), `template` (field group template), `choices` (`inline` for stock `RadioSelect` and `CheckboxSelectMultiple`), and `prefix`/`suffix` (escaped text for stock widgets rendered with daisyUI's `input` component). Every other name becomes a widget attribute. `class=` and `class+=` both **append** to daisy classes; `+=` is accepted for parity with django-widget-tweaks and is rejected on any other name.
+- `label_class` affects the primary label for ordinary fields, the standalone label for checkbox/toggle fields, and the legend for grouped choices. It does not affect individual choice option labels. The package's default and horizontal templates render it; custom field templates are responsible for applying `field.label_class` if desired. Since the value is supplied by the project, include custom classes in the project's Tailwind scan or safelist.
 - `choices` accepts only `inline`; unsupported values, widget types, or custom choice templates MUST raise `TemplateSyntaxError`. The default choice layout remains vertical.
 - `prefix` and `suffix` MUST only be accepted for stock, visible, single-line widgets rendered with daisyUI's `input` component. Hidden, checkbox, radio, file, range, color, and custom-template widgets are rejected. Text addons MUST be escaped and MUST NOT accept HTML or icon markup. Addons MUST mirror the control's daisyUI `input-*` size, colour and error modifiers so the joined group renders as one control.
-- `choices`, `prefix` and `suffix` became reserved when the layout options were added; earlier builds passed them through as widget attributes. Set the HTML `prefix` attribute (RDFa) through widget `attrs` instead.
+- `label_class`, `choices`, `prefix` and `suffix` are reserved `{% daisy_field %}` options. Earlier builds passed `choices`, `prefix`, and `suffix` through as widget attributes. Set the HTML `prefix` attribute (RDFa) through widget `attrs` instead.
 - MUST raise `TemplateSyntaxError` (case-insensitively) for inline-handler names (`on*`, `hx-on*`, `x-on*`, `x-init`, with an optional `data-` prefix) and for `aria-invalid`/`aria-describedby`.
 - MUST raise `ValueError` at render time when the argument does not resolve to a bound field (for example a mistyped field name).
 - Renders `copy.copy(bf)` with overrides through `as_field_group()` (or the template override). It never mutates the form.
@@ -298,7 +300,8 @@ Tooling: `uv sync`, `uv run pytest`, `uv run mypy --strict src` (django-stubs pl
   - Done (unreleased): README examples for the opt-in field layouts and addons;
   - Done (unreleased): optional local Playwright browser checks (`just browser-test`); axe is still open;
   - MultiWidget/SplitDateTime templates;
-  - htmx 4 recipes (inline validation, `hx-target` field group, `422` swaps) and a Django 6 partials recipe;
+  - Done (unreleased): whole-form htmx 2 validation using a re-rendered `422` fragment (see [`docs/recipes/htmx-form-validation.md`](recipes/htmx-form-validation.md));
+  - htmx 4 validation and response-handling updates, plus a Django 6 partials recipe;
   - documented size and colour class recipes.
 - **P2 (not committed):** autocomplete, pickers, dynamic formsets, multistep. Each needs a separate proposal.
 

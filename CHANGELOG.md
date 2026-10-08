@@ -24,7 +24,8 @@ First public release.
 - `daisy_forms.widgets`: `Toggle`, `NativeDateInput`, `NativeTimeInput`, and
   `NativeDateTimeInput`.
 - `{% daisy_field %}` for per-field classes (`class+=`), labels, templates, and
-  attributes such as `hx-*`. Inline event handlers and the managed `aria-*`
+  attributes such as `hx-*`; `label_class=` appends classes to the main label
+  or choice-group legend. Inline event handlers and the managed `aria-*`
   attributes are rejected when the template is compiled.
 - Opt-in layouts for `{% daisy_field %}`: `daisy_forms/field_horizontal.html`,
   `choices="inline"` for radio and checkbox choices, and escaped text
@@ -37,7 +38,8 @@ First public release.
 
 ### Changed
 
-- `choices`, `prefix`, and `suffix` are reserved `{% daisy_field %}` options.
+- `label_class`, `choices`, `prefix`, and `suffix` are reserved
+  `{% daisy_field %}` options.
   Earlier development builds passed them through as HTML attributes. Set the
   HTML `prefix` attribute through widget `attrs` instead.
 - The generated `daisy_forms_css` file now includes the layout and addon

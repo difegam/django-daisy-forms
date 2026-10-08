@@ -103,7 +103,8 @@ Server-side validation stays authoritative. Invalid fields render with
 `aria-invalid="true"`, error lists use the `{id}_error` ids that
 `aria-describedby` references, and controls switch to their `-error` class.
 When using htmx, return a `422` with the re-rendered field group; no htmx
-dependency is required.
+dependency is required. For whole-form submissions, see the
+[HTMX validation recipe](docs/recipes/htmx-form-validation.md).
 
 <p align="center">
   <img alt="Submitting an invalid email returns 422 and the form re-renders with input-error, aria-invalid, and aria-describedby; fixing the email and choosing a plan returns 200" src="docs/assets/demo/validate.gif" width="880">
@@ -119,9 +120,13 @@ For one-off fields, load the tag library and pass normal widget attributes:
 ```
 
 `class+=` merges with the daisyUI classes, and `label=` and `template=`
-override the label and the field template. Every other name becomes a widget
-attribute, except the reserved options `label`, `template`, `choices`,
-`prefix`, and `suffix`. Inline handlers (`on*`, `hx-on*`,
+override the label and the field template. `label_class=` appends classes to
+the field's main label (or choice-group legend); it does not style individual
+choice labels. The package's default and horizontal templates render it;
+custom field templates must use `field.label_class` themselves. Add the class
+to your Tailwind source or safelist if your project does not otherwise use it.
+Every other name becomes a widget attribute except `label`, `label_class`,
+`template`, `choices`, `prefix`, and `suffix`. Inline handlers (`on*`, `hx-on*`,
 `x-on*`, `x-init`) and the managed `aria-invalid` and `aria-describedby`
 attributes raise a `TemplateSyntaxError` when the template is compiled.
 
@@ -160,6 +165,31 @@ Unsupported combinations, such as `choices="grid"`, `choices` on a select, or
 `prefix` on a hidden, checkbox, or radio field, raise a `TemplateSyntaxError`
 when the field renders. The layout classes are part of the `daisy_forms_css`
 output, so regenerate that file when upgrading the package.
+
+### Composed forms
+
+Use ordinary Django template markup to group fields and place actions. This
+keeps the form structure in the project, with no package layout API:
+
+```django
+{% load daisy_forms %}
+<form method="post">
+  {% csrf_token %}
+  <fieldset>
+    <legend>Account</legend>
+    {% daisy_field form.email template="daisy_forms/field_horizontal.html" label_class="font-semibold" %}
+  </fieldset>
+  <fieldset>
+    <legend>Plan and features</legend>
+    {% daisy_field form.plan choices="inline" %}
+    {% daisy_field form.features choices="inline" %}
+  </fieldset>
+  <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+    <button class="btn btn-ghost" type="reset">Reset</button>
+    <button class="btn btn-primary" type="submit">Save</button>
+  </div>
+</form>
+```
 
 ### Tailwind CSS
 

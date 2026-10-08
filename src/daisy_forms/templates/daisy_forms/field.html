@@ -1,11 +1,11 @@
 {% if field.field.widget.input_type == "checkbox" and not field.use_fieldset %}<div class="fieldset">
-<label class="label" for="{{ field.id_for_label }}">{{ field }} {{ field.label }}{% if field.field.required %}<span class="text-error" aria-hidden="true"> *</span>{% endif %}</label>
+<label class="label{% if field.label_class %} {{ field.label_class }}{% endif %}" for="{{ field.id_for_label }}">{{ field }} {{ field.label }}{% if field.field.required %}<span class="text-error" aria-hidden="true"> *</span>{% endif %}</label>
 {% include "daisy_forms/_field_meta.html" %}</div>
 {% elif field.use_fieldset %}<fieldset class="fieldset"{% if field.aria_describedby %} aria-describedby="{{ field.aria_describedby }}"{% endif %}>
-{% if field.label %}<legend class="fieldset-legend">{{ field.label }}{% if field.field.required %}<span class="text-error" aria-hidden="true"> *</span>{% endif %}</legend>{% endif %}
+{% if field.label %}<legend class="fieldset-legend{% if field.label_class %} {{ field.label_class }}{% endif %}">{{ field.label }}{% if field.field.required %}<span class="text-error" aria-hidden="true"> *</span>{% endif %}</legend>{% endif %}
 {% include "daisy_forms/_field_meta.html" %}{{ field }}
 </fieldset>
 {% else %}<div class="fieldset">
-{% if field.label %}<label class="fieldset-legend" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<span class="text-error" aria-hidden="true"> *</span>{% endif %}</label>{% endif %}
+{% if field.label %}<label class="fieldset-legend{% if field.label_class %} {{ field.label_class }}{% endif %}" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<span class="text-error" aria-hidden="true"> *</span>{% endif %}</label>{% endif %}
 {% include "daisy_forms/_field_meta.html" %}{{ field }}
 </div>{% endif %}

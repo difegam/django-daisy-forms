@@ -1,19 +1,43 @@
-# django-daisy-forms
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-dark.svg">
+    <img alt="django-daisy-forms" src="docs/assets/logo.svg" width="420">
+  </picture>
+</p>
 
-`django-daisy-forms` provides Django-native daisyUI 5 form rendering without
-django-crispy-forms. It uses Django's form renderer and `BoundField` APIs, so
-existing `{{ form }}` and `{{ formset }}` templates keep working.
+<h3 align="center">daisyUI 5 forms for Django.</h3>
 
-## Support policy
+<p align="center">
+  Render daisyUI 5 markup from Django's own form renderer and <code>BoundField</code>
+  APIs. Point one setting at the daisy renderer and your existing
+  <code>{{ form }}</code> and <code>{{ formset }}</code> templates keep working.
+</p>
 
-The package targets Python 3.12 or later and Django 5.2, 6.0, and 6.1. It has
-one runtime dependency, Django. Tailwind CSS and daisyUI remain dependencies of
-the project that consumes this package.
+<p align="center">
+  <img alt="Python 3.12+" src="https://img.shields.io/badge/python-3.12%2B-44D19A">
+  <img alt="Django 5.2 | 6.0 | 6.1" src="https://img.shields.io/badge/django-5.2%20%7C%206.0%20%7C%206.1-0C4B33">
+  <img alt="daisyUI 5" src="https://img.shields.io/badge/daisyUI-5-FFC94A">
+  <img alt="Tailwind CSS 4.1+" src="https://img.shields.io/badge/tailwind-4.1%2B-38BDF8">
+  <a href="https://github.com/difegam/django-daisy-forms/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/difegam/django-daisy-forms/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/license-MIT-9B8CFF"></a>
+</p>
 
-## Installation
+<p align="center">
+  <a href="#quickstart">Quickstart</a> ·
+  <a href="#why-django-daisy-forms">Why</a> ·
+  <a href="#features">Features</a> ·
+  <a href="#support">Support</a> ·
+  <a href="#roadmap">Roadmap</a> ·
+  <a href="#development">Development</a>
+</p>
 
-After the first release is published to PyPI, install the package with uv or
-pip:
+<p align="center">
+  <img alt="django-daisy-forms in 30 seconds: one setting turns a plain Django form into daisyUI, server errors render accessibly, a template tag customizes fields, and a generated Tailwind source file keeps the CSS in sync" src="docs/assets/demo.gif" width="720">
+</p>
+
+## Quickstart
+
+Install the package with uv or pip:
 
 ```bash
 uv add django-daisy-forms
@@ -21,9 +45,12 @@ uv add django-daisy-forms
 python -m pip install django-daisy-forms
 ```
 
-## Consumer setup
+> [!NOTE]
+> The package installs from PyPI after the first release is published.
 
-Configure the renderer in the project settings:
+Configure the renderer in the project settings. Django's
+[`FORM_RENDERER`](https://docs.djangoproject.com/en/stable/ref/settings/#form-renderer)
+setting selects the renderer used by every form and formset:
 
 ```python
 INSTALLED_APPS = [
@@ -35,24 +62,53 @@ INSTALLED_APPS = [
 FORM_RENDERER = "daisy_forms.renderers.DaisyFormRenderer"
 ```
 
-The package requires Tailwind CSS 4.1 or later and daisyUI 5.0.36 or later.
-Generate the class source file in the project that owns the Tailwind build:
+Then render `{{ form }}` as usual. `python manage.py check` reports
+`daisy_forms.E001` when `django.forms` is missing from `INSTALLED_APPS`, and
+`daisy_forms.W001` when `FORM_RENDERER` is not the daisy renderer.
 
-```bash
-python manage.py daisy_forms_css --output static/src/daisy-forms.css
-```
+## Why django-daisy-forms
 
-Import the generated file after Tailwind and daisyUI, then check it in CI:
+- **One setting.** `FORM_RENDERER` switches every `{{ form }}`, `{{ formset }}`
+  and `{{ form.field.as_field_group }}` to daisyUI markup. No FormHelper, no
+  layout DSL.
+- **Built on Django's APIs.** A class registry gives each widget its daisyUI
+  component through a custom `BoundField`. Django's global widget templates are
+  never overridden, and custom widgets are left alone.
+- **The server has the final say.** Errors come from Django validation and use
+  the same `aria-invalid` and `aria-describedby` ids Django already generates.
+- **One tag for per-field control.** `{% daisy_field %}` merges classes and
+  passes attributes such as `hx-*`, and refuses inline event handlers.
+- **CSS that can't drift.** A management command writes the Tailwind
+  `@source inline()` file, and `--check` fails CI when it is out of date.
+- **Small footprint.** One runtime dependency, Django, and no JavaScript.
 
-```css
-@import "tailwindcss";
-@plugin "daisyui";
-@import "./daisy-forms.css";
-```
+## Features
 
-```bash
-python manage.py daisy_forms_css --output static/src/daisy-forms.css --check
-```
+### Rendering
+
+Each Django widget gets its daisyUI component class: `input`, `textarea`,
+`select`, `checkbox`, `radio`, `toggle`, `file-input`, and `range`. Fields with
+errors also get the matching `-error` variant. `daisy_forms.widgets` adds
+`Toggle` plus native `NativeDateInput`, `NativeTimeInput`, and
+`NativeDateTimeInput` widgets. Help text is escaped unless it is marked safe.
+
+<p align="center">
+  <img alt="A plain Django form is scanned into daisyUI markup while each widget is labelled with its class: EmailInput to input, RadioSelect to radio, Select to select, NativeDateInput to input, Toggle to toggle" src="docs/assets/demo/render.gif" width="880">
+</p>
+
+### Validation
+
+Server-side validation stays authoritative. Invalid fields render with
+`aria-invalid="true"`, error lists use the `{id}_error` ids that
+`aria-describedby` references, and controls switch to their `-error` class.
+When using htmx, return a `422` with the re-rendered field group; no htmx
+dependency is required.
+
+<p align="center">
+  <img alt="Submitting an invalid email returns 422 and the form re-renders with input-error, aria-invalid, and aria-describedby; fixing the email and choosing a plan returns 200" src="docs/assets/demo/validate.gif" width="880">
+</p>
+
+### Per-field control
 
 For one-off fields, load the tag library and pass normal widget attributes:
 
@@ -61,13 +117,72 @@ For one-off fields, load the tag library and pass normal widget attributes:
 {% daisy_field form.email class+="input-sm" hx-post="/validate/email/" hx-trigger="blur" %}
 ```
 
-The package keeps server-side validation authoritative. Return a `422` with
-the re-rendered field group when using htmx; no htmx dependency is required.
+`class+=` merges with the daisyUI classes, and `label=` and `template=`
+override the label and the field template. Inline handlers (`on*`, `hx-on*`,
+`x-on*`, `x-init`) and the managed `aria-invalid` and `aria-describedby`
+attributes raise a `TemplateSyntaxError` when the template is compiled.
 
-## Layout examples
+<p align="center">
+  <img alt="The daisy_field tag renders an input with input-sm and hx attributes, then a field with onclick fails with TemplateSyntaxError: Attribute is not allowed: onclick" src="docs/assets/demo/field.gif" width="880">
+</p>
 
-The default keeps fields stacked vertically. Opt into a horizontal field,
-inline radio choices, or text addons where they help the form:
+### Tailwind CSS
+
+The package requires Tailwind CSS 4.1 or later and daisyUI 5.0.36 or later.
+Tailwind does not scan `site-packages`, so the package ships its classes as a
+source file. Generate it in the project that owns the Tailwind build:
+
+```bash
+python manage.py daisy_forms_css --output static/src/daisy-forms.css
+```
+
+Import the generated file after Tailwind and daisyUI:
+
+```css
+@import "tailwindcss";
+@plugin "daisyui";
+@import "./daisy-forms.css";
+```
+
+Then check it in CI:
+
+```bash
+python manage.py daisy_forms_css --output static/src/daisy-forms.css --check
+```
+
+<p align="center">
+  <img alt="daisy_forms_css writes an @source inline file listing every class the package emits, and the --check run exits cleanly" src="docs/assets/demo/css.gif" width="880">
+</p>
+
+### Themes
+
+The markup uses daisyUI component classes only, so any daisyUI theme applies
+through `data-theme` with nothing to configure in the package.
+
+<p align="center">
+  <img alt="The same signup form switching between the dark, cupcake, synthwave, nord, and retro daisyUI themes" src="docs/assets/demo/themes.gif" width="520">
+</p>
+
+## Support
+
+| Requirement | Supported |
+| --- | --- |
+| Python | 3.12 or later |
+| Django | 5.2, 6.0, 6.1 |
+| Tailwind CSS | 4.1 or later |
+| daisyUI | 5.0.36 or later |
+
+The package has one runtime dependency, Django. Tailwind CSS and daisyUI remain
+dependencies of the project that consumes this package.
+
+## Roadmap
+
+> [!NOTE]
+> Horizontal fields, inline choices, and input addons are specified but not
+> released yet. The API below is planned and may change.
+
+Fields will stay stacked by default, with opt-in horizontal labels, inline
+radio and checkbox choices, and plain-text prefix and suffix addons:
 
 ![Before and after: default stacked form fields compared with horizontal labels, inline choices, and price addons](docs/images/forms-before-after.png)
 
@@ -78,11 +193,11 @@ inline radio choices, or text addons where they help the form:
 {% daisy_field form.price prefix="$" suffix="USD" %}
 ```
 
-Inline choices apply to radio and checkbox choice fields. Prefixes and suffixes
-are plain text addons for supported single-line inputs; the values are escaped
-by Django's template engine. Fields remain stacked by default.
+Inline choices will apply to radio and checkbox choice fields. Prefixes and
+suffixes will be plain text addons for supported single-line inputs, escaped by
+Django's template engine.
 
-## Contributor setup
+## Development
 
 Install [uv](https://docs.astral.sh/uv/) and [Just](https://just.systems/),
 then run:
@@ -112,17 +227,21 @@ Prek runs Ruff and whitespace, YAML, and TOML checks before commits. CI runs
 the declared Django and Python matrix, builds both release artifacts, and smoke
 tests them in isolated environments.
 
-## Releases
+<details>
+<summary><strong>Releasing</strong></summary>
 
 Choose the release level and run `just bump-patch`, `just bump-minor`, or
 `just bump-major`. These recipes use `uv version --bump` to update the package
 version and lockfile. Review and commit the changes, merge them to `main`, then
-push a matching semantic version tag such as `v0.1.0`. The release workflow
-checks that the tag matches the package version, rebuilds and smoke-tests the
-wheel and source distribution, adds provenance attestations, and publishes
-through PyPI Trusted Publishing. Before the first release, configure a PyPI
-trusted publisher for this GitHub repository and the `pypi` GitHub Actions
-environment.
+push a matching semantic version tag such as `v0.1.0`.
+
+The release workflow checks that the tag matches the package version, rebuilds
+and smoke-tests the wheel and source distribution, adds provenance attestations,
+and publishes through PyPI Trusted Publishing. Before the first release,
+configure a PyPI trusted publisher for this GitHub repository and the `pypi`
+GitHub Actions environment.
+
+</details>
 
 ## License
 

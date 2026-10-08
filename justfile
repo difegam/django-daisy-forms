@@ -24,3 +24,19 @@ check: format-check lint typecheck test
 
 build:
     uv build --no-sources
+
+[doc("Upgrade dependencies within their declared constraints")]
+update:
+    uv lock --upgrade && uv sync --all-groups
+
+[doc("Bump the package patch version with uv")]
+bump-patch:
+    uv version --bump patch
+
+[doc("Bump the package minor version with uv")]
+bump-minor:
+    uv version --bump minor
+
+[doc("Bump the package major version with uv")]
+bump-major:
+    uv version --bump major

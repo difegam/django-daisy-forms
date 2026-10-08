@@ -82,6 +82,10 @@ plugins = ["mypy_django_plugin.main"]
 files = ["src/daisy_forms", "tests"]
 exclude = ["^build/", "^dist/", ".*/migrations/.*"]
 
+[[tool.mypy.overrides]]
+module = ["playwright", "playwright.*"]
+ignore_missing_imports = true
+
 [tool.django-stubs]
 django_settings_module = "tests.settings"
 

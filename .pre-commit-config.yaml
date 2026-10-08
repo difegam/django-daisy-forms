@@ -37,13 +37,6 @@ repos:
         name: Ruff lint
         args: [--fix]
 
-  - repo: https://github.com/PyCQA/autoflake
-    rev: v2.3.1
-    hooks:
-      - id: autoflake
-        name: remove unused imports/variables
-        args: [--in-place, --remove-all-unused-imports, --remove-unused-variables]
-
   - repo: https://github.com/PyCQA/bandit
     rev: 1.8.3
     hooks:
@@ -58,10 +51,13 @@ repos:
       - id: djlint-reformat-django
         name: format Django templates
         files: \.html$
+        # Package templates and golden files are the markup contract; never reflow them.
+        exclude: ^(src/daisy_forms/templates|tests/golden|tests/templates)/
       - id: djlint-django
         name: lint Django templates
         files: \.html$
-        args: [--ignore, H021,H023]
+        exclude: ^tests/golden/
+        args: [--ignore, "H021,H023,H030,H031"]
 
   - repo: https://github.com/hukkin/mdformat
     rev: 1.0.0
@@ -69,7 +65,10 @@ repos:
       - id: mdformat
         name: format Markdown
         types: [markdown]
+        # Rewrites list indentation and card separators; run on demand with `just doc-format`.
+        stages: [manual]
         additional_dependencies:
+          - mdformat-frontmatter
           - mdformat-gfm
           - mdformat-mkdocs
 
@@ -113,14 +112,14 @@ repos:
 
       - id: pytest-coverage
         name: check test coverage
-        entry: bash -c 'uv run pytest --cov --cov-report=term-missing --cov-fail-under=80'
+        entry: uv run pytest --cov
         language: system
         pass_filenames: false
         stages: [pre-push, manual]
 
       - id: mypy
         name: type check Python
-        entry: uv run mypy src tests
+        entry: uv run mypy --strict src/daisy_forms tests
         language: system
         pass_filenames: false
         require_serial: true

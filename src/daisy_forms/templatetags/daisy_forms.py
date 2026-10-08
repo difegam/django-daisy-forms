@@ -50,6 +50,12 @@ class DaisyFieldNode(template.Node):
                 clone.label = value
             elif name == "template":
                 clone.template_override = value
+            elif name == "choices":
+                clone.choice_layout = value
+            elif name == "prefix":
+                clone.prefix = value
+            elif name == "suffix":
+                clone.suffix = value
             elif name == "class":
                 extra_attrs["class"] = merge_class(extra_attrs.get("class"), value)
             else:

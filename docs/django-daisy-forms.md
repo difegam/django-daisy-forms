@@ -1,10 +1,10 @@
 # django-daisy-forms: Verified Research, Design Changes, and SPEC.md
 
-The approach holds up, with one condition: a Django-native daisyUI 5 form renderer without crispy is practical on Django 5.2+. The mechanism is a small `TemplatesSetting` subclass that sets three template names and a custom `BoundField`, plus about five templates. Per-field customization reuses APIs Django already has (widget `attrs`, `Field.template_name`, field-level `bound_field_class`) and one attribute-passthrough template tag, so nothing like FormHelper has to be rebuilt. The real risk is CSS delivery, not rendering: Tailwind 4 does not scan `site-packages`. The contract therefore makes a generated `@source inline()` safelist file, owned by the user's project, part of the public API.
+The approach holds up: a Django-native daisyUI 5 form renderer without crispy is practical on Django 5.2+. The mechanism is a small `TemplatesSetting` subclass, a custom `BoundField`, and focused templates. Per-field customization reuses Django's widget `attrs`, `Field.template_name`, field-level `bound_field_class`, and one attribute-passthrough tag with a few explicit layout options. The real risk is CSS delivery, not rendering: Tailwind 4 does not scan `site-packages`. The contract therefore makes a generated `@source inline()` file, owned by the user's project, part of the public API.
 
 ## TL;DR
 
-- **Build it, but keep it smaller than proposed.** Since Django 5.2, project-wide `BaseRenderer.bound_field_class` exists alongside `form_template_name`/`field_template_name` (5.0). That means `{{ form }}` can render daisyUI markup after one `FORM_RENDERER` line, without overriding Django's global widget templates. Drop `{% render_form %}`, themes, layout primitives, Cotton integration, any package settings and Pydantic. Ship one tag (`{% daisy_field %}`) and a tiny `widgets.py` (Toggle plus native date/time inputs).
+- **Keep the integration Django-native.** Since Django 5.2, project-wide `BaseRenderer.bound_field_class` exists alongside `form_template_name`/`field_template_name` (5.0). That means `{{ form }}` can render daisyUI markup after one `FORM_RENDERER` line, without overriding Django's global widget templates. Drop `{% render_form %}`, themes, a full layout DSL, Cotton integration, package settings and Pydantic. Use one tag (`{% daisy_field %}`) for field attributes, optional horizontal groups, inline choices, and text addons.
 - **Make the CSS contract explicit.** A management command, `daisy_forms_css`, writes a committed `@source inline("…")` file (needs Tailwind ≥ 4.1) generated from a single Python class registry. A test enforces that the registry is a superset of every class used in the package templates. Path-based `@source` into `site-packages` is offered only as a convenience, because the path breaks across venvs and Docker.
 - **Server errors are authoritative and accessible by contract.** Error lists are rendered with `id="{auto_id}_error"` and help text with `id="{auto_id}_helptext"`, which are exactly the ids Django 5.2's `BoundField.aria_describedby` references. Error colour comes from `*-error` classes, not daisyUI's client-side `validator`. Kill criterion: if the spike needs global widget-template overrides or more than one Python extension point beyond those listed, contribute to a crispy daisyUI pack instead.
 
@@ -54,20 +54,20 @@ The approach holds up, with one condition: a Django-native daisyUI 5 form render
 | 2 | Per-widget classes | **BoundField class registry** (MRO lookup, dict in `classes.py`) applied in `build_widget_attrs`; no global widget-template overrides | Classes live in Python, so a safelist is mandatory (that is the point of the registry) |
 | 3 | Widget templates (radio, checkbox group, clearable file) | Swap `template_name`/`option_template_name` on a **copy** of the widget, only if the widget still uses Django's stock template | Third-party widgets with custom templates are untouched by design |
 | 4 | Third-party/custom widgets | Same guard: unknown widgets or customized templates get no daisy class and render inside the standard field wrapper | Custom widgets need an explicit `attrs={"class": …}` to be styled |
-| 5 | Template tags | **One tag**: `{% daisy_field bf [label=…] [template=…] attr=value… %}` with widget-tweaks-style passthrough. Drop `{% render_form %}` (`{{ form }}` works) | Hyphenated attributes (`hx-post`) need a small custom kwarg parser |
+| 5 | Template tags | **One tag**: `{% daisy_field bf [label=…] [template=…] [choices=inline] [prefix=…] [suffix=…] attr=value… %}` with widget-tweaks-style passthrough. Drop `{% render_form %}` (`{{ form }}` works) | Hyphenated attributes (`hx-post`) need a small custom kwarg parser |
 | 6 | Python per-field options | No new API: widget `attrs` (classes merge), `Field.template_name`, field-level `bound_field_class`, plus `daisy_forms.widgets` (Toggle, NativeDate/Time/DateTime) | Size and colour variants are spelled as daisyUI classes, not enums |
 | 7 | Configuration | **No package settings, no Pydantic.** Configure by subclassing the renderer (class attributes) | Less "magic"; teams that want a toggle subclass in 3 lines |
 | 8 | Error UX | Server errors only: `aria-invalid`, ids matching Django, `*-error` classes; `validator` opt-in | No live client feedback by default (use htmx per-field validation) |
 | 9 | Field element order | label → help → errors → control, aligned with Django 6.1 admin; checkboxes: control+label, then help, errors | Differs from daisyUI doc examples (help below input); overridable via `field.html`\[25\] |
 | 10 | help_text escaping | Render `{{ field.help_text }}` **without** `\|safe`: plain strings are escaped, `mark_safe` strings pass through | Deliberate divergence from Django's documented "isn't HTML-escaped"; document it\[17\] |
 | 11 | Tailwind integration | Generated `@source inline()` file in the user's repo, `--check` for CI; path printer as secondary | One extra step on install and upgrade |
-| 12 | Themes, layouts, horizontal, Cotton | Themes are pure CSS (`data-theme`), so drop them. Drop layout primitives (write HTML). Horizontal becomes a P1 alternate `field_horizontal.html` via `template=`. Cotton is a docs recipe only | Fewer features, far less surface |
+| 12 | Themes, layouts, horizontal, Cotton | Themes are pure CSS (`data-theme`), so drop them. Keep layout composition in templates. Horizontal is an opt-in `field_horizontal.html`; inline choices and text addons are direct tag options. Cotton is a docs recipe only | Avoids a general-purpose layout DSL |
 | 13 | Tests | Golden-HTML files compared with `assertHTMLEqual` (no syrupy); a real Tailwind build job; axe optional in P1; no visual regression | Golden files must be reviewed on markup changes, which is intended |
 | 14 | Packaging | `uv_build` backend (stable; pure Python; templates inside the module root are packaged); MIT; name `django-daisy-forms` / import `daisy_forms` **after** a PyPI 404 check\[40\]\[41\]\[42\] | uv_build has fewer knobs than hatchling, which is fine for pure Python |
 | 15 | Type checking | mypy `--strict` + django-stubs (pick one checker); ruff lint and format | django-stubs pins lag Django releases slightly |
 
 **Where the original proposal over-engineers:**
-- `render_form`, themes, layout primitives, Cotton integration, visual regression, a settings layer, and a per-field option mechanism all duplicate Django or CSS.
+- `render_form`, themes, a general layout DSL, Cotton integration, visual regression, and a settings layer duplicate Django or CSS.
 
 **Where it under-specifies:**
 - class merge semantics;
@@ -92,7 +92,7 @@ The approach holds up, with one condition: a Django-native daisyUI 5 form render
 4. Small surface: one renderer, one BoundField, one template tag, four widgets, one management command, one system check module.
 
 ## 2. Non-goals
-crispy compatibility, FormHelper, Layout DSL, Bootstrap or plain-Tailwind renderers, Alpine, JavaScript of any kind, client-side validation logic, themes, package-level settings, Pydantic, Jinja2 support, autocomplete, date pickers, dynamic formsets, multistep wizards.
+crispy compatibility, FormHelper, a general Layout DSL, Bootstrap or plain-Tailwind renderers, Alpine, JavaScript of any kind, client-side validation logic, themes, package-level settings, Pydantic, Jinja2 support, autocomplete, date pickers, dynamic formsets, multistep wizards.
 
 ## 3. Supported versions
 - Python ≥ 3.12. Django ≥ 5.2 (`Django>=5.2,<6.2`). CI covers Django 5.2, 6.0 and 6.1 on Python 3.12, 3.13 and 3.14 where Django officially supports the combination.
@@ -126,7 +126,7 @@ No other public attributes in P0. Users customize by subclassing it.
   4. `extra_attrs["class"]` from the tag.
 - Other `extra_attrs` keys override widget attrs. The keys `aria-invalid` and `aria-describedby` from tag kwargs are rejected.
 - `as_widget(widget=None, attrs=None, only_initial=False)` MUST swap in the package template only on a `copy.copy(widget)`, and only when the widget's `template_name`/`option_template_name` equal the stock value of its nearest registered Django base class.
-- Instance attributes: `extra_attrs: dict[str, str]` (default empty) and `template_override: str | None`. These are set only on copies made by the tag.
+- Instance attributes: `extra_attrs: dict[str, str]` (default empty), `template_override: str | None`, `choice_layout: str | None`, `prefix: str | None`, and `suffix: str | None`. These are set only on copies made by the tag.
 - A blank `template_override` MUST raise `TemplateDoesNotExist` before Django's template loader runs.
 - Escape hatch (documented): set `Field.bound_field_class = forms.BoundField` to opt a field out. An opted-out field cannot be passed to `{% daisy_field %}`, which raises `TemplateSyntaxError`; render it with `{{ field }}` instead.
 
@@ -156,9 +156,13 @@ Stock `DateInput` and the other stock widgets keep Django's defaults (`type="tex
 ```django
 {% daisy_field form.email label="Work email" class="input-sm" hx-post="/validate/email/" hx-trigger="blur" %}
 {% daisy_field form.bio template="daisy_forms/field_horizontal.html" %}
+{% daisy_field form.plan choices="inline" %}
+{% daisy_field form.price prefix="$" suffix="USD" %}
 ```
 - Grammar: `{% daisy_field <bound_field> (<name>(=|+=)<expr>)* %}`. Names match `^[A-Za-z_][A-Za-z0-9_:.\-]*$`. Values are template expressions.
-- Reserved names: `label` (overrides the label text on a copy) and `template` (field group template). Every other name becomes a widget attribute. `class=` and `class+=` both **append** to daisy classes; `+=` is accepted for parity with django-widget-tweaks and is rejected on any other name.
+- Reserved names: `label` (overrides label text), `template` (field group template), `choices` (`inline` for stock `RadioSelect` and `CheckboxSelectMultiple`), and `prefix`/`suffix` (escaped text for stock widgets rendered with daisyUI's `input` component). Every other name becomes a widget attribute. `class=` and `class+=` both **append** to daisy classes; `+=` is accepted for parity with django-widget-tweaks and is rejected on any other name.
+- `choices` accepts only `inline`; unsupported values, widget types, or custom choice templates MUST raise `TemplateSyntaxError`. The default choice layout remains vertical.
+- `prefix` and `suffix` MUST only be accepted for stock, visible, single-line widgets rendered with daisyUI's `input` component. Hidden, checkbox, radio, file, range, color, and custom-template widgets are rejected. Text addons MUST be escaped and MUST NOT accept HTML or icon markup.
 - MUST raise `TemplateSyntaxError` (case-insensitively) for inline-handler names (`on*`, `hx-on*`, `x-on*`, `x-init`, with an optional `data-` prefix) and for `aria-invalid`/`aria-describedby`.
 - MUST raise `ValueError` at render time when the argument does not resolve to a bound field (for example a mistyped field name).
 - Renders `copy.copy(bf)` with overrides through `as_field_group()` (or the template override). It never mutates the form.
@@ -179,12 +183,15 @@ Users override these by placing same-named files in their project `TEMPLATES["DI
 - `daisy_forms/formset.html`
 - `daisy_forms/field.html`
 - `daisy_forms/_field_meta.html` (help text and errors, included by `field.html`; a custom `field.html` must ship or replace it)
-- `daisy_forms/field_horizontal.html` (P1)
+- `daisy_forms/field_horizontal.html`
 - `daisy_forms/widgets/radio.html`, `radio_option.html`, `checkbox_select.html`, `checkbox_option.html`, `clearable_file_input.html`
+- `daisy_forms/widgets/radio_inline.html`, `checkbox_select_inline.html`
 
 Template names are public API, and renames are breaking changes.
 
 ## 5. Markup contract (daisyUI 5)
+
+`field_horizontal.html` preserves the field markup and accessibility rules below while placing the label beside the control at larger breakpoints. The default `field.html` remains unchanged. `choices="inline"` swaps only the outer container of stock radio and checkbox choice widgets to a wrapping row.
 
 Rules that apply to every field:
 - The wrapper is `<div class="fieldset">` for single controls and `<fieldset class="fieldset">` + `<legend class="fieldset-legend">` when `field.use_fieldset` (RadioSelect and CheckboxSelectMultiple; `ClearableFileInput` is `False` on 5.2, 6.0 and 6.1, but the template reads `field.use_fieldset`, so it follows Django).
@@ -286,7 +293,8 @@ Tooling: `uv sync`, `uv run pytest`, `uv run mypy --strict src` (django-stubs pl
   - Verify: admin impact; `select[multiple]` styling; whether daisyUI emits component CSS without detection; `@source inline()` inside an imported file.
 - **P0 (0.1.0):** all §5 widgets, formsets, the tag, the widgets module, the command, checks, docs and full CI.
 - **P1 (0.2.x):**
-  - `field_horizontal.html`;
+  - `field_horizontal.html`, inline choice layouts, and text prefix/suffix addons;
+  - README examples for the opt-in field layouts and addons;
   - MultiWidget/SplitDateTime templates;
   - optional Playwright + axe job;
   - htmx 4 recipes (inline validation, `hx-target` field group, `422` swaps) and a Django 6 partials recipe;

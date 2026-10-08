@@ -122,6 +122,27 @@ override the label and the field template. Inline handlers (`on*`, `hx-on*`,
 `x-on*`, `x-init`) and the managed `aria-invalid` and `aria-describedby`
 attributes raise a `TemplateSyntaxError` when the template is compiled.
 
+The tag also supports opt-in layout and text-addon options:
+
+```django
+{% daisy_field form.email template="daisy_forms/field_horizontal.html" %}
+{% daisy_field form.plan choices="inline" %}
+{% daisy_field form.features choices="inline" %}
+{% daisy_field form.price prefix="$" suffix="USD" %}
+```
+
+The horizontal template stacks labels and controls on narrow screens and places
+them side by side at larger widths. `choices="inline"` applies to
+`RadioSelect` and `CheckboxSelectMultiple`; choices remain stacked by default.
+Prefix and suffix apply to stock single-line widgets styled with daisyUI's
+`input` component. Addon values are escaped text, so pass `$` or `kg` rather
+than HTML. Existing field markup stays the default when these options are not
+set.
+
+The new styles are included in the generated file from `daisy_forms_css`.
+Regenerate that file when upgrading the package and keep its `--check` command
+in CI.
+
 <p align="center">
   <img alt="The daisy_field tag renders an input with input-sm and hx attributes, then a field with onclick fails with TemplateSyntaxError: Attribute is not allowed: onclick" src="docs/assets/demo/field.gif" width="880">
 </p>

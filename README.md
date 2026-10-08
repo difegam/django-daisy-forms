@@ -122,6 +122,27 @@ override the label and the field template. Inline handlers (`on*`, `hx-on*`,
 `x-on*`, `x-init`) and the managed `aria-invalid` and `aria-describedby`
 attributes raise a `TemplateSyntaxError` when the template is compiled.
 
+The tag also supports opt-in layout and text-addon options:
+
+```django
+{% daisy_field form.email template="daisy_forms/field_horizontal.html" %}
+{% daisy_field form.plan choices="inline" %}
+{% daisy_field form.features choices="inline" %}
+{% daisy_field form.price prefix="$" suffix="USD" %}
+```
+
+The horizontal template stacks labels and controls on narrow screens and places
+them side by side at larger widths. `choices="inline"` applies to
+`RadioSelect` and `CheckboxSelectMultiple`; choices remain stacked by default.
+Prefix and suffix apply to stock single-line widgets styled with daisyUI's
+`input` component. Addon values are escaped text, so pass `$` or `kg` rather
+than HTML. Existing field markup stays the default when these options are not
+set.
+
+The new styles are included in the generated file from `daisy_forms_css`.
+Regenerate that file when upgrading the package and keep its `--check` command
+in CI.
+
 <p align="center">
   <img alt="The daisy_field tag renders an input with input-sm and hx attributes, then a field with onclick fails with TemplateSyntaxError: Attribute is not allowed: onclick" src="docs/assets/demo/field.gif" width="880">
 </p>
@@ -222,6 +243,18 @@ just build      Build wheel and source-distribution artifacts.
 
 Run `just update` to upgrade the lockfile within declared dependency
 constraints and sync all development groups.
+
+For optional local browser validation of the form layouts, use Node 20 or later,
+install the browser tools and Chromium, then run the browser checks:
+
+```bash
+just browser-setup
+just browser-test
+```
+
+To inspect the live preview with the pinned Playwright CLI, run `just
+browser-preview` in one terminal and `just browser-cli` in another. The browser
+checks are opt-in and stay out of the default test and CI runs.
 
 Prek runs Ruff and whitespace, YAML, and TOML checks before commits. CI runs
 the declared Django and Python matrix, builds both release artifacts, and smoke

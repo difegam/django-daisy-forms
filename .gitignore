@@ -19,5 +19,7 @@ htmlcov/
 
 # Tailwind verification output
 tests/tailwind/node_modules/
+tests/browser-cli/node_modules/
+.playwright-cli/
 tests/tailwind/daisy-forms.css
 tests/tailwind/output.css

@@ -1,6 +1,7 @@
 from pathlib import Path
 
 SECRET_KEY = "django-daisy-forms-test-key"
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 TESTS_DIR = Path(__file__).parent
 
 INSTALLED_APPS = [

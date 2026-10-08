@@ -46,11 +46,14 @@ dev = [
     { include-group = "lint" },
     { include-group = "type" },
 ]
+browser = ["playwright==1.63.0"]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "tests.settings"
 pythonpath = [".", "src"]
 testpaths = ["tests"]
+addopts = "-m 'not browser'"
+markers = ["browser: optional local browser checks requiring Playwright and Chromium"]
 
 [tool.coverage.run]
 branch = true
@@ -78,6 +81,10 @@ strict = true
 plugins = ["mypy_django_plugin.main"]
 files = ["src/daisy_forms", "tests"]
 exclude = ["^build/", "^dist/", ".*/migrations/.*"]
+
+[[tool.mypy.overrides]]
+module = ["playwright", "playwright.*"]
+ignore_missing_imports = true
 
 [tool.django-stubs]
 django_settings_module = "tests.settings"

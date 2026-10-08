@@ -1,0 +1,7 @@
+{
+  "name": "django-daisy-forms-browser-cli",
+  "private": true,
+  "devDependencies": {
+    "@playwright/cli": "0.1.21"
+  }
+}

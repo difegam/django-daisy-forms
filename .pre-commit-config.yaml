@@ -81,7 +81,8 @@ repos:
     hooks:
       - id: markdown-link-check
         name: check documentation links
-        args: [--quiet]
+        # Rate-limited (429) responses count as alive; see .markdown-link-check.json.
+        args: [--quiet, --config, .markdown-link-check.json]
         stages: [pre-push, manual]
 
   - repo: https://github.com/codespell-project/codespell

@@ -1,5 +1,5 @@
 init:
-    uv sync --locked --group dev
+    uv sync --locked --all-groups
     uv run prek install --hook-type pre-commit --hook-type pre-push --hook-type commit-msg
 
 clean:
@@ -30,7 +30,7 @@ css-check:
     uv run python tests/tailwind/check_css.py
 
 browser-setup:
-    uv sync --locked --group dev --group browser
+    uv sync --locked --all-groups
     uv run playwright install chromium
     npm ci --prefix tests/browser-cli
     npm --prefix tests/browser-cli exec -- playwright-cli install-browser chromium

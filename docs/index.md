@@ -1,6 +1,7 @@
 ---
 hide:
   - navigation
+  - toc
 ---
 
 # daisyUI 5 forms for Django
@@ -16,7 +17,9 @@ Render daisyUI 5 markup from Django's own form renderer and `BoundField` APIs. P
     <a href="https://github.com/difegam/django-daisy-forms/blob/main/LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/license-MIT-9B8CFF"></a>
 </p>
 
-![Demo](assets/demo.gif)
+<p align="center">
+  <img alt="django-daisy-forms in 30 seconds: one setting turns a plain Django form into daisyUI, server errors render accessibly, a template tag customizes fields, and a generated Tailwind source file keeps the CSS in sync" src="assets/demo.gif" width="720">
+</p>
 
 ## Quick start
 

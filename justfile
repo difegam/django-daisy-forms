@@ -1,4 +1,13 @@
-[private]
+init:
+    uv sync --locked --group dev
+    uv run prek install --hook-type pre-commit --hook-type pre-push --hook-type commit-msg
+
+clean:
+    rm -rf .venv .pytest_cache .ruff_cache .mypy_cache .coverage htmlcov site dist
+    find . -type d -name "__pycache__" -exec rm -rf {} +
+
+fresh: clean init
+
 format-check:
     uv run ruff format --check .
 
@@ -62,3 +71,22 @@ bump-minor:
 [doc("Bump the package major version with uv")]
 bump-major:
     uv version --bump major
+
+[group("ci")]
+verify: check css-check build doc-build
+
+# Documentation
+[doc("Preview documentation locally")]
+[group("docs")]
+doc-serve:
+    uv run zensical serve
+
+[doc("Build documentation (fail on warnings)")]
+[group("docs")]
+doc-build:
+    uv run zensical build --clean --strict
+
+[doc("Format documentation markdown files")]
+[group("docs")]
+doc-format:
+    uvx --with mdformat-gfm --with mdformat-mkdocs mdformat docs

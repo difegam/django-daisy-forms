@@ -172,6 +172,39 @@ def test_daisy_field_tag_renders_escaped_prefix_and_suffix_addons() -> None:
     assert "<strong>" not in output
 
 
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_daisy_field_tag_addons_mirror_input_error_state() -> None:
+    form = LayoutTagForm(data={"price": "not-a-number"})
+    form.is_valid()
+
+    output = Template(
+        '{% load daisy_forms %}{% daisy_field form.price prefix="$" suffix="USD" %}'
+    ).render(Context({"form": form}))
+
+    assert '<span class="input input-error join-item w-auto">$</span>' in output
+    assert '<span class="input input-error join-item w-auto">USD</span>' in output
+    assert 'class="input input-error join-item flex-1"' in output
+    assert 'aria-invalid="true"' in output
+
+
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_daisy_field_tag_addons_mirror_size_and_color_modifiers() -> None:
+    output = Template(
+        '{% load daisy_forms %}{% daisy_field form.price prefix="$" suffix="USD" '
+        'class+="input-sm input-primary rounded-none" hx-post="/price/" %}'
+    ).render(Context({"form": LayoutTagForm()}))
+
+    assert (
+        '<span class="input input-sm input-primary join-item w-auto">$</span>' in output
+    )
+    assert (
+        '<span class="input input-sm input-primary join-item w-auto">USD</span>'
+        in output
+    )
+    assert output.count("rounded-none") == 1
+    assert output.count('hx-post="/price/"') == 1
+
+
 @pytest.mark.parametrize(
     "attribute",
     [

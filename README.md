@@ -26,8 +26,8 @@
   <a href="#quickstart">Quickstart</a> ·
   <a href="#why-django-daisy-forms">Why</a> ·
   <a href="#features">Features</a> ·
+  <a href="#layouts-and-addons">Layouts</a> ·
   <a href="#support">Support</a> ·
-  <a href="#roadmap">Roadmap</a> ·
   <a href="#development">Development</a>
 </p>
 
@@ -76,8 +76,9 @@ Then render `{{ form }}` as usual. `python manage.py check` reports
   never overridden, and custom widgets are left alone.
 - **The server has the final say.** Errors come from Django validation and use
   the same `aria-invalid` and `aria-describedby` ids Django already generates.
-- **One tag for per-field control.** `{% daisy_field %}` merges classes and
-  passes attributes such as `hx-*`, and refuses inline event handlers.
+- **One tag for per-field control.** `{% daisy_field %}` merges classes, passes
+  attributes such as `hx-*`, and opts fields into horizontal layouts, inline
+  choices, or text addons. It refuses inline event handlers.
 - **CSS that can't drift.** A management command writes the Tailwind
   `@source inline()` file, and `--check` fails CI when it is out of date.
 - **Small footprint.** One runtime dependency, Django, and no JavaScript.
@@ -118,34 +119,47 @@ For one-off fields, load the tag library and pass normal widget attributes:
 ```
 
 `class+=` merges with the daisyUI classes, and `label=` and `template=`
-override the label and the field template. Inline handlers (`on*`, `hx-on*`,
+override the label and the field template. Every other name becomes a widget
+attribute, except the reserved options `label`, `template`, `choices`,
+`prefix`, and `suffix`. Inline handlers (`on*`, `hx-on*`,
 `x-on*`, `x-init`) and the managed `aria-invalid` and `aria-describedby`
 attributes raise a `TemplateSyntaxError` when the template is compiled.
 
-The tag also supports opt-in layout and text-addon options:
+<p align="center">
+  <img alt="The daisy_field tag renders an input with input-sm and hx attributes, then a field with onclick fails with TemplateSyntaxError: Attribute is not allowed: onclick" src="docs/assets/demo/field.gif" width="880">
+</p>
+
+### Layouts and addons
+
+Fields stay stacked by default. Opt into a horizontal field, inline choices, or
+text addons where they help the form:
 
 ```django
+{% load daisy_forms %}
 {% daisy_field form.email template="daisy_forms/field_horizontal.html" %}
 {% daisy_field form.plan choices="inline" %}
 {% daisy_field form.features choices="inline" %}
 {% daisy_field form.price prefix="$" suffix="USD" %}
 ```
 
-The horizontal template stacks labels and controls on narrow screens and places
-them side by side at larger widths. `choices="inline"` applies to
-`RadioSelect` and `CheckboxSelectMultiple`; choices remain stacked by default.
-Prefix and suffix apply to stock single-line widgets styled with daisyUI's
-`input` component. Addon values are escaped text, so pass `$` or `kg` rather
-than HTML. Existing field markup stays the default when these options are not
-set.
-
-The new styles are included in the generated file from `daisy_forms_css`.
-Regenerate that file when upgrading the package and keep its `--check` command
-in CI.
-
 <p align="center">
-  <img alt="The daisy_field tag renders an input with input-sm and hx attributes, then a field with onclick fails with TemplateSyntaxError: Attribute is not allowed: onclick" src="docs/assets/demo/field.gif" width="880">
+  <img alt="Before and after: default stacked form fields compared with horizontal labels, inline choices, and price addons" src="docs/images/forms-before-after.png" width="880">
 </p>
+
+- **Horizontal fields.** `field_horizontal.html` stacks the label and control on
+  narrow screens and places them side by side from the `md` breakpoint.
+- **Inline choices.** `choices="inline"` lays out stock `RadioSelect` and
+  `CheckboxSelectMultiple` options in a wrapping row.
+- **Text addons.** `prefix` and `suffix` join plain text to stock single-line
+  widgets styled with daisyUI's `input` component. Values are escaped, so pass
+  `$` or `kg` rather than HTML. Addons copy the input's size, color, and error
+  modifiers, so `class+="input-sm"` or a validation error styles the whole
+  group.
+
+Unsupported combinations, such as `choices="grid"`, `choices` on a select, or
+`prefix` on a hidden, checkbox, or radio field, raise a `TemplateSyntaxError`
+when the field renders. The layout classes are part of the `daisy_forms_css`
+output, so regenerate that file when upgrading the package.
 
 ### Tailwind CSS
 
@@ -196,28 +210,6 @@ through `data-theme` with nothing to configure in the package.
 The package has one runtime dependency, Django. Tailwind CSS and daisyUI remain
 dependencies of the project that consumes this package.
 
-## Roadmap
-
-> [!NOTE]
-> Horizontal fields, inline choices, and input addons are specified but not
-> released yet. The API below is planned and may change.
-
-Fields will stay stacked by default, with opt-in horizontal labels, inline
-radio and checkbox choices, and plain-text prefix and suffix addons:
-
-![Before and after: default stacked form fields compared with horizontal labels, inline choices, and price addons](docs/images/forms-before-after.png)
-
-```django
-{% load daisy_forms %}
-{% daisy_field form.email template="daisy_forms/field_horizontal.html" %}
-{% daisy_field form.plan choices="inline" %}
-{% daisy_field form.price prefix="$" suffix="USD" %}
-```
-
-Inline choices will apply to radio and checkbox choice fields. Prefixes and
-suffixes will be plain text addons for supported single-line inputs, escaped by
-Django's template engine.
-
 ## Development
 
 Install [uv](https://docs.astral.sh/uv/) and [Just](https://just.systems/),
@@ -239,6 +231,11 @@ just test       Run pytest.
 just css-check  Build the Tailwind and daisyUI fixture.
 just check      Run formatting, linting, type checks, and tests.
 just build      Build wheel and source-distribution artifacts.
+
+just browser-setup    Install Playwright, Chromium, and the browser CLI.
+just browser-test     Run the opt-in browser checks for form layouts.
+just browser-preview  Serve the layout preview at 127.0.0.1:8000/__preview__/.
+just browser-cli      Open the preview in the pinned Playwright CLI.
 ```
 
 Run `just update` to upgrade the lockfile within declared dependency

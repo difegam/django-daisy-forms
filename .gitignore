@@ -23,3 +23,7 @@ tests/browser-cli/node_modules/
 .playwright-cli/
 tests/tailwind/daisy-forms.css
 tests/tailwind/output.css
+tests/tailwind/preview-output.css
+
+# Local planning notes
+docs/superpowers/

@@ -260,3 +260,79 @@ def test_daisy_field_tag_explains_opt_out_fields_are_unsupported() -> None:
 
     with pytest.raises(TemplateSyntaxError, match="opts out"):
         template.render(Context({"form": OptOutForm()}))
+
+
+class LabelClassForm(forms.Form):
+    email = forms.EmailField()
+    agree = forms.BooleanField()
+    plan = forms.ChoiceField(
+        choices=[("basic", "Basic"), ("pro", "Pro")],
+        widget=forms.RadioSelect,
+    )
+
+
+@pytest.mark.parametrize(
+    ("field_name", "template_name", "expected"),
+    [
+        ("email", "", '<label class="fieldset-legend font-semibold" for="id_email">'),
+        (
+            "email",
+            "daisy_forms/field_horizontal.html",
+            '<label class="fieldset-legend md:w-48 md:shrink-0 font-semibold" '
+            'for="id_email">',
+        ),
+        ("agree", "", '<label class="label font-semibold" for="id_agree">'),
+        (
+            "agree",
+            "daisy_forms/field_horizontal.html",
+            '<label class="label md:w-48 md:shrink-0 font-semibold" for="id_agree">',
+        ),
+        ("plan", "", '<legend class="fieldset-legend font-semibold">'),
+        (
+            "plan",
+            "daisy_forms/field_horizontal.html",
+            '<legend class="fieldset-legend md:w-48 md:shrink-0 font-semibold">',
+        ),
+    ],
+    ids=[
+        "label",
+        "horizontal-label",
+        "checkbox",
+        "horizontal-checkbox",
+        "legend",
+        "horizontal-legend",
+    ],
+)
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_daisy_field_tag_appends_label_class(
+    field_name: str, template_name: str, expected: str
+) -> None:
+    template_option = f' template="{template_name}"' if template_name else ""
+    output = Template(
+        f"{{% load daisy_forms %}}{{% daisy_field form.{field_name} "
+        f'label_class="font-semibold"{template_option} %}}'
+    ).render(Context({"form": LabelClassForm()}))
+
+    assert expected in output
+    assert "label_class" not in output
+
+
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_daisy_field_tag_escapes_label_class() -> None:
+    output = Template(
+        "{% load daisy_forms %}{% daisy_field form.email label_class=extra %}"
+    ).render(Context({"form": LabelClassForm(), "extra": '"><script>'}))
+
+    assert "<script>" not in output
+    assert "&quot;&gt;&lt;script&gt;" in output
+
+
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_daisy_field_tag_without_label_class_keeps_default_label() -> None:
+    form = LabelClassForm()
+    output = Template("{% load daisy_forms %}{% daisy_field form.email %}").render(
+        Context({"form": form})
+    )
+
+    assert '<label class="fieldset-legend" for="id_email">' in output
+    assert output == str(form["email"].as_field_group())

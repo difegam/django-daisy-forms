@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-dark.svg">
-    <img alt="django-daisy-forms" src="docs/assets/logo.svg" width="420">
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/difegam/django-daisy-forms/main/docs/assets/logo-dark.svg">
+    <img alt="django-daisy-forms" src="https://raw.githubusercontent.com/difegam/django-daisy-forms/main/docs/assets/logo.svg" width="420">
   </picture>
 </p>
 
@@ -14,12 +14,13 @@
 </p>
 
 <p align="center">
+  <a href="https://pypi.org/project/django-daisy-forms/"><img alt="PyPI" src="https://img.shields.io/pypi/v/django-daisy-forms"></a>
   <img alt="Python 3.12+" src="https://img.shields.io/badge/python-3.12%2B-44D19A">
   <img alt="Django 5.2 | 6.0 | 6.1" src="https://img.shields.io/badge/django-5.2%20%7C%206.0%20%7C%206.1-0C4B33">
   <img alt="daisyUI 5" src="https://img.shields.io/badge/daisyUI-5-FFC94A">
   <img alt="Tailwind CSS 4.1+" src="https://img.shields.io/badge/tailwind-4.1%2B-38BDF8">
   <a href="https://github.com/difegam/django-daisy-forms/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/difegam/django-daisy-forms/actions/workflows/ci.yml/badge.svg"></a>
-  <a href="LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/license-MIT-9B8CFF"></a>
+  <a href="https://github.com/difegam/django-daisy-forms/blob/main/LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/license-MIT-9B8CFF"></a>
 </p>
 
 <p align="center">
@@ -32,7 +33,7 @@
 </p>
 
 <p align="center">
-  <img alt="django-daisy-forms in 30 seconds: one setting turns a plain Django form into daisyUI, server errors render accessibly, a template tag customizes fields, and a generated Tailwind source file keeps the CSS in sync" src="docs/assets/demo.gif" width="720">
+  <img alt="django-daisy-forms in 30 seconds: one setting turns a plain Django form into daisyUI, server errors render accessibly, a template tag customizes fields, and a generated Tailwind source file keeps the CSS in sync" src="https://raw.githubusercontent.com/difegam/django-daisy-forms/main/docs/assets/demo.gif" width="720">
 </p>
 
 ## Quickstart
@@ -44,9 +45,6 @@ uv add django-daisy-forms
 # or
 python -m pip install django-daisy-forms
 ```
-
-> [!NOTE]
-> The package installs from PyPI after the first release is published.
 
 Configure the renderer in the project settings. Django's
 [`FORM_RENDERER`](https://docs.djangoproject.com/en/stable/ref/settings/#form-renderer)
@@ -94,7 +92,7 @@ errors also get the matching `-error` variant. `daisy_forms.widgets` adds
 `NativeDateTimeInput` widgets. Help text is escaped unless it is marked safe.
 
 <p align="center">
-  <img alt="A plain Django form is scanned into daisyUI markup while each widget is labelled with its class: EmailInput to input, RadioSelect to radio, Select to select, NativeDateInput to input, Toggle to toggle" src="docs/assets/demo/render.gif" width="880">
+  <img alt="A plain Django form is scanned into daisyUI markup while each widget is labelled with its class: EmailInput to input, RadioSelect to radio, Select to select, NativeDateInput to input, Toggle to toggle" src="https://raw.githubusercontent.com/difegam/django-daisy-forms/main/docs/assets/demo/render.gif" width="880">
 </p>
 
 ### Validation
@@ -104,10 +102,10 @@ Server-side validation stays authoritative. Invalid fields render with
 `aria-describedby` references, and controls switch to their `-error` class.
 When using htmx, return a `422` with the re-rendered field group; no htmx
 dependency is required. For whole-form submissions, see the
-[HTMX validation recipe](docs/recipes/htmx-form-validation.md).
+[HTMX validation recipe](https://github.com/difegam/django-daisy-forms/blob/main/docs/recipes/htmx-form-validation.md).
 
 <p align="center">
-  <img alt="Submitting an invalid email returns 422 and the form re-renders with input-error, aria-invalid, and aria-describedby; fixing the email and choosing a plan returns 200" src="docs/assets/demo/validate.gif" width="880">
+  <img alt="Submitting an invalid email returns 422 and the form re-renders with input-error, aria-invalid, and aria-describedby; fixing the email and choosing a plan returns 200" src="https://raw.githubusercontent.com/difegam/django-daisy-forms/main/docs/assets/demo/validate.gif" width="880">
 </p>
 
 ### Per-field control
@@ -131,7 +129,7 @@ Every other name becomes a widget attribute except `label`, `label_class`,
 attributes raise a `TemplateSyntaxError` when the template is compiled.
 
 <p align="center">
-  <img alt="The daisy_field tag renders an input with input-sm and hx attributes, then a field with onclick fails with TemplateSyntaxError: Attribute is not allowed: onclick" src="docs/assets/demo/field.gif" width="880">
+  <img alt="The daisy_field tag renders an input with input-sm and hx attributes, then a field with onclick fails with TemplateSyntaxError: Attribute is not allowed: onclick" src="https://raw.githubusercontent.com/difegam/django-daisy-forms/main/docs/assets/demo/field.gif" width="880">
 </p>
 
 ### Layouts and addons
@@ -148,7 +146,7 @@ text addons where they help the form:
 ```
 
 <p align="center">
-  <img alt="Before and after: default stacked form fields compared with horizontal labels, inline choices, and price addons" src="docs/images/forms-before-after.png" width="880">
+  <img alt="Before and after: default stacked form fields compared with horizontal labels, inline choices, and price addons" src="https://raw.githubusercontent.com/difegam/django-daisy-forms/main/docs/images/forms-before-after.png" width="880">
 </p>
 
 - **Horizontal fields.** `field_horizontal.html` stacks the label and control on
@@ -216,7 +214,7 @@ python manage.py daisy_forms_css --output static/src/daisy-forms.css --check
 ```
 
 <p align="center">
-  <img alt="daisy_forms_css writes an @source inline file listing every class the package emits, and the --check run exits cleanly" src="docs/assets/demo/css.gif" width="880">
+  <img alt="daisy_forms_css writes an @source inline file listing every class the package emits, and the --check run exits cleanly" src="https://raw.githubusercontent.com/difegam/django-daisy-forms/main/docs/assets/demo/css.gif" width="880">
 </p>
 
 ### Themes
@@ -225,7 +223,7 @@ The markup uses daisyUI component classes only, so any daisyUI theme applies
 through `data-theme` with nothing to configure in the package.
 
 <p align="center">
-  <img alt="The same signup form switching between the dark, cupcake, synthwave, nord, and retro daisyUI themes" src="docs/assets/demo/themes.gif" width="520">
+  <img alt="The same signup form switching between the dark, cupcake, synthwave, nord, and retro daisyUI themes" src="https://raw.githubusercontent.com/difegam/django-daisy-forms/main/docs/assets/demo/themes.gif" width="520">
 </p>
 
 ## Support
@@ -259,6 +257,7 @@ just lint       Run Ruff linting.
 just typecheck  Run strict mypy with django-stubs.
 just test       Run pytest.
 just css-check  Build the Tailwind and daisyUI fixture.
+just css-preview  Build the fixture CSS for the browser preview.
 just check      Run formatting, linting, type checks, and tests.
 just build      Build wheel and source-distribution artifacts.
 
@@ -305,4 +304,4 @@ GitHub Actions environment.
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT. See [LICENSE](https://github.com/difegam/django-daisy-forms/blob/main/LICENSE).

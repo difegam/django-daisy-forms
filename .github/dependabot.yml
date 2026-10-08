@@ -8,6 +8,10 @@ updates:
     directory: /tests/tailwind
     schedule:
       interval: monthly
+  - package-ecosystem: npm
+    directory: /tests/browser-cli
+    schedule:
+      interval: monthly
   - package-ecosystem: github-actions
     directory: /
     schedule:

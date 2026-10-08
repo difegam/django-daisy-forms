@@ -1,4 +1,3 @@
 @import "tailwindcss";
 @plugin "daisyui";
-@source "../templates";
 @import "./daisy-forms.css";

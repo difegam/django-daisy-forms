@@ -9,6 +9,8 @@ release.
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-08
+
 First public release.
 
 ### Added
@@ -51,3 +53,6 @@ First public release.
 - Text addons now copy the input's daisyUI size, color, and error modifiers.
   Previously, an invalid field showed neutral addons around a red input, and
   `class+="input-sm"` left the addons at full size.
+
+[Unreleased]: https://github.com/difegam/django-daisy-forms/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/difegam/django-daisy-forms/releases/tag/v0.1.0

@@ -4,13 +4,15 @@ from pathlib import Path
 from daisy_forms.classes import all_classes, daisy_class_for
 from daisy_forms.widgets import Toggle
 
+_TEMPLATE_SYNTAX_RE = re.compile(r"\{%.*?%\}|\{\{.*?\}\}")
+
 
 def test_registry_covers_literal_template_classes() -> None:
     template_root = Path("src/daisy_forms/templates/daisy_forms")
     literals: set[str] = set()
     for template in template_root.rglob("*.html"):
         for value in re.findall(r'class="([^"]+)"', template.read_text()):
-            literals.update(value.split())
+            literals.update(_TEMPLATE_SYNTAX_RE.sub(" ", value).split())
 
     assert literals <= all_classes()
 

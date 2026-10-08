@@ -4,7 +4,7 @@ from django import forms
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
-TAILWIND_OUTPUT = Path(__file__).parent.parent / "tailwind" / "output.css"
+TAILWIND_OUTPUT = Path(__file__).parent.parent / "tailwind" / "preview-output.css"
 
 
 class FormPreview(forms.Form):
@@ -35,7 +35,7 @@ def preview_form(request: HttpRequest) -> HttpResponse:
 def preview_css(request: HttpRequest) -> HttpResponse:
     if not TAILWIND_OUTPUT.is_file():
         return HttpResponse(
-            "Run `just css-check` before opening the browser preview.",
+            "Run `just css-preview` before opening the browser preview.",
             status=503,
             content_type="text/plain; charset=utf-8",
         )

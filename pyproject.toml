@@ -1,7 +1,7 @@
 [project]
 name = "django-daisy-forms"
 version = "0.1.0"
-description = "Django-native daisyUI form rendering"
+description = "daisyUI 5 forms for Django, rendered through Django's own form renderer"
 readme = "README.md"
 authors = [
     { name = "Diego Gamboa", email = "difegam3@gmail.com" }
@@ -10,21 +10,28 @@ license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.12"
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 3 - Alpha",
+    "Environment :: Web Environment",
     "Framework :: Django",
     "Framework :: Django :: 5.2",
     "Framework :: Django :: 6.0",
     "Framework :: Django :: 6.1",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: User Interfaces",
+    "Typing :: Typed",
 ]
 keywords = ["daisyui", "django", "forms", "tailwind"]
 dependencies = ["Django>=5.2,<6.2"]
 
 [project.urls]
+Changelog = "https://github.com/difegam/django-daisy-forms/blob/main/CHANGELOG.md"
 Documentation = "https://github.com/difegam/django-daisy-forms#readme"
 Issues = "https://github.com/difegam/django-daisy-forms/issues"
 Source = "https://github.com/difegam/django-daisy-forms"

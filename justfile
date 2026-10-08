@@ -26,10 +26,13 @@ browser-setup:
     npm ci --prefix tests/browser-cli
     npm --prefix tests/browser-cli exec -- playwright-cli install-browser chromium
 
-browser-test: css-check
+css-preview: css-check
+    npm --prefix tests/tailwind run build:preview
+
+browser-test: css-preview
     uv run pytest --override-ini addopts= -m browser tests/browser
 
-browser-preview: css-check
+browser-preview: css-preview
     PYTHONPATH=. uv run django-admin runserver --skip-checks --settings=tests.settings 127.0.0.1:8000
 
 browser-cli:

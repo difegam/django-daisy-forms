@@ -164,9 +164,10 @@ def test_daisy_field_tag_renders_escaped_prefix_and_suffix_addons() -> None:
 
     assert '<div class="join w-full">' in output
     assert (
-        '<span class="input join-item">&lt;strong&gt;$&lt;/strong&gt;</span>' in output
+        '<span class="input join-item w-auto">&lt;strong&gt;$&lt;/strong&gt;</span>'
+        in output
     )
-    assert '<span class="input join-item">USD</span>' in output
+    assert '<span class="input join-item w-auto">USD</span>' in output
     assert 'class="input join-item flex-1"' in output
     assert "<strong>" not in output
 

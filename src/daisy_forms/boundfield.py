@@ -219,12 +219,12 @@ class DaisyBoundField(BoundField):
             return rendered_widget
 
         prefix = (
-            format_html('<span class="input join-item">{}</span>', self.prefix)
+            format_html('<span class="input join-item w-auto">{}</span>', self.prefix)
             if self.prefix
             else ""
         )
         suffix = (
-            format_html('<span class="input join-item">{}</span>', self.suffix)
+            format_html('<span class="input join-item w-auto">{}</span>', self.suffix)
             if self.suffix
             else ""
         )

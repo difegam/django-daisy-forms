@@ -52,6 +52,7 @@ LAYOUT_CLASSES: Final[frozenset[str]] = frozenset(
         "gap-2",
         "join",
         "join-item",
+        "w-auto",
         "md:flex-row",
         "md:flex",
         "md:items-start",

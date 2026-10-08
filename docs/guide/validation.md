@@ -2,6 +2,8 @@
 
 django-daisy-forms keeps validation server-authoritative. Errors come from Django's validation, and the package renders them accessibly using the same `aria` attributes Django already generates.
 
+![Submitting an invalid email returns 422 and the form re-renders with input-error, aria-invalid, and aria-describedby; fixing the email and choosing a plan returns 200](../assets/demo/validate.gif)
+
 ## How errors are rendered
 
 When a field fails validation, the package:

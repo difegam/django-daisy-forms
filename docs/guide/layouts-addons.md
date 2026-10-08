@@ -2,6 +2,8 @@
 
 Fields stay stacked by default. django-daisy-forms provides opt-in layouts for horizontal fields, inline choices, and text addons.
 
+![Before and after: default stacked form fields compared with horizontal labels, inline choices, and price addons](../images/forms-before-after.png)
+
 ## Horizontal fields
 
 The `field_horizontal.html` template places the label beside the control at larger breakpoints:

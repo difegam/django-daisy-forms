@@ -72,6 +72,15 @@ Text addon after the input:
 
 Same restrictions as `prefix`.
 
+Addon text is escaped. The addons copy the input's daisyUI size, color, and
+error modifiers (`input-xs` to `input-xl`, `input-primary` and the other color
+variants, `input-ghost`, `input-error`), so `class+="input-sm"` or a validation
+error styles the whole group:
+
+```django
+{% daisy_field form.price prefix="$" suffix="USD" class+="input-sm" %}
+```
+
 ## Attributes
 
 Any other keyword argument becomes a widget attribute:
@@ -140,20 +149,32 @@ Passing a non-bound-field argument raises a `ValueError` at render time:
 ```
 
 ```text
-ValueError: ...
+ValueError: {% daisy_field %} expected a bound field, got ''.
+```
+
+### Opted-out fields
+
+A field whose `bound_field_class` is a plain `BoundField` opts out of the
+package. Passing it to the tag raises:
+
+```text
+TemplateSyntaxError: {% daisy_field %} cannot be used on a field that opts out of DaisyBoundField (a plain BoundField opts out); render it with {{ field }} instead.
 ```
 
 ### Invalid options
 
 Unsupported option values raise `TemplateSyntaxError`:
 
-```django
-{% daisy_field form.plan choices="grid" %}
-```
+These are raised when the field renders:
 
-```text
-TemplateSyntaxError: ...
-```
+| Usage                                                                                        | Error                                                                               |
+| -------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `choices="grid"`                                                                             | `choices must be set to 'inline'.`                                                  |
+| `choices="inline"` on a non-choice widget                                                    | `choices='inline' requires a stock RadioSelect or CheckboxSelectMultiple widget.`   |
+| `prefix` or `suffix` on a hidden, checkbox, radio, textarea, file, or custom-template widget | `prefix and suffix require a stock widget rendered with daisyUI's input component.` |
+
+`+=` on any attribute other than `class` fails when the template compiles with
+`Only class supports +=`.
 
 ## How it works
 

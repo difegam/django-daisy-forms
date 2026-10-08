@@ -30,7 +30,7 @@ dependencies = ["Django>=5.2,<6.2"]
 
 [project.urls]
 Changelog = "https://github.com/difegam/django-daisy-forms/blob/main/CHANGELOG.md"
-Documentation = "https://github.com/difegam/django-daisy-forms#readme"
+Documentation = "https://difegam.github.io/django-daisy-forms/"
 Issues = "https://github.com/difegam/django-daisy-forms/issues"
 Source = "https://github.com/difegam/django-daisy-forms"
 

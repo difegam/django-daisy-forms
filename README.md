@@ -19,11 +19,13 @@
   <img alt="Django 5.2 | 6.0 | 6.1" src="https://img.shields.io/badge/django-5.2%20%7C%206.0%20%7C%206.1-0C4B33">
   <img alt="daisyUI 5" src="https://img.shields.io/badge/daisyUI-5-FFC94A">
   <img alt="Tailwind CSS 4.1+" src="https://img.shields.io/badge/tailwind-4.1%2B-38BDF8">
+  <a href="https://difegam.github.io/django-daisy-forms/"><img alt="Documentation" src="https://img.shields.io/badge/docs-difegam.github.io-4F46E5"></a>
   <a href="https://github.com/difegam/django-daisy-forms/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/difegam/django-daisy-forms/actions/workflows/ci.yml/badge.svg"></a>
   <a href="https://github.com/difegam/django-daisy-forms/blob/main/LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/license-MIT-9B8CFF"></a>
 </p>
 
 <p align="center">
+  <a href="https://difegam.github.io/django-daisy-forms/"><strong>Documentation</strong></a> ·
   <a href="#quickstart">Quickstart</a> ·
   <a href="#why-django-daisy-forms">Why</a> ·
   <a href="#features">Features</a> ·
@@ -63,6 +65,10 @@ FORM_RENDERER = "daisy_forms.renderers.DaisyFormRenderer"
 Then render `{{ form }}` as usual. `python manage.py check` reports
 `daisy_forms.E001` when `django.forms` is missing from `INSTALLED_APPS`, and
 `daisy_forms.W001` when `FORM_RENDERER` is not the daisy renderer.
+
+Read the [full documentation](https://difegam.github.io/django-daisy-forms/) for guides on rendering, validation,
+per-field control, layouts, Tailwind CSS, and themes, plus the API reference
+and troubleshooting.
 
 ## Why django-daisy-forms
 

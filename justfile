@@ -79,12 +79,12 @@ verify: check css-check build doc-build
 [doc("Preview documentation locally")]
 [group("docs")]
 doc-serve:
-    uv run zensical serve
+    uv run --group docs zensical serve
 
 [doc("Build documentation (fail on warnings)")]
 [group("docs")]
 doc-build:
-    uv run zensical build --clean --strict
+    uv run --group docs zensical build --clean --strict
 
 [doc("Format documentation markdown files")]
 [group("docs")]

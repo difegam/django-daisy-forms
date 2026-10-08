@@ -3,9 +3,7 @@ name = "django-daisy-forms"
 version = "0.1.0"
 description = "daisyUI 5 forms for Django, rendered through Django's own form renderer"
 readme = "README.md"
-authors = [
-    { name = "Diego Gamboa", email = "difegam3@gmail.com" }
-]
+authors = [{ name = "Diego Gamboa", email = "difegam3@gmail.com" }]
 license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.12"
@@ -37,11 +35,7 @@ Issues = "https://github.com/difegam/django-daisy-forms/issues"
 Source = "https://github.com/difegam/django-daisy-forms"
 
 [dependency-groups]
-test = [
-    "pytest>=8.4",
-    "pytest-cov>=7.0",
-    "pytest-django>=4.11",
-]
+test = ["pytest>=8.4", "pytest-cov>=7.0", "pytest-django>=4.11"]
 lint = ["prek>=0.4", "ruff>=0.14"]
 type = [
     "django-stubs-ext>=5.2",
@@ -53,6 +47,7 @@ dev = [
     { include-group = "lint" },
     { include-group = "type" },
 ]
+docs = ["zensical>=0.0.69"]
 browser = ["playwright==1.63.0"]
 
 [tool.pytest.ini_options]
@@ -60,7 +55,9 @@ DJANGO_SETTINGS_MODULE = "tests.settings"
 pythonpath = [".", "src"]
 testpaths = ["tests"]
 addopts = "-m 'not browser'"
-markers = ["browser: optional local browser checks requiring Playwright and Chromium"]
+markers = [
+    "browser: optional local browser checks requiring Playwright and Chromium",
+]
 
 [tool.coverage.run]
 branch = true

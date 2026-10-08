@@ -28,3 +28,11 @@ tests/tailwind/preview-output.css
 # Local planning notes and release drafts
 docs/superpowers/
 .release/
+
+# Zensical documentation
+site/
+
+docs/superpowers/.*
+
+# Local agent notes
+.opencode/

@@ -103,5 +103,5 @@ Django renders the invalid form's help text, field errors,
 `aria-invalid` and `aria-describedby` in the usual way. The browser only swaps
 that HTML; no client-side validation code or package middleware is needed.
 
-See the [HTMX 2 response-handling documentation](https://v2-0v2-0.htmx.org/docs/#configuring-response-handling)
+See the [HTMX 2 response-handling documentation](https://htmx.org/docs/#response-handling)
 for the status handling configuration described here.

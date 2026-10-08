@@ -9,14 +9,14 @@ The class registry maps Django widget types to daisyUI component classes. The lo
 | Django widget            | daisyUI class | Notes                        |
 | ------------------------ | ------------- | ---------------------------- |
 | `HiddenInput`            | *None*        | No class applied             |
-| `TextInput`              | `input`       | Base for text-like inputs    |
-| `EmailInput`             | `input`       | Inherits from `TextInput`    |
-| `URLInput`               | `input`       | Inherits from `TextInput`    |
-| `NumberInput`            | `input`       | Inherits from `TextInput`    |
-| `PasswordInput`          | `input`       | Inherits from `TextInput`    |
-| `DateInput`              | `input`       | Inherits from `TextInput`    |
-| `DateTimeInput`          | `input`       | Inherits from `TextInput`    |
-| `TimeInput`              | `input`       | Inherits from `TextInput`    |
+| `TextInput`              | `input`       | Via the `Input` base class   |
+| `EmailInput`             | `input`       | Via the `Input` base class   |
+| `URLInput`               | `input`       | Via the `Input` base class   |
+| `NumberInput`            | `input`       | Via the `Input` base class   |
+| `PasswordInput`          | `input`       | Via the `Input` base class   |
+| `DateInput`              | `input`       | Registered directly          |
+| `DateTimeInput`          | `input`       | Registered directly          |
+| `TimeInput`              | `input`       | Registered directly          |
 | `Textarea`               | `textarea`    |                              |
 | `Select`                 | `select`      | Includes `NullBooleanSelect` |
 | `CheckboxInput`          | `checkbox`    |                              |
@@ -29,6 +29,17 @@ The class registry maps Django widget types to daisyUI component classes. The lo
 | `NativeTimeInput`        | `input`       | Package widget               |
 | `NativeDateTimeInput`    | `input`       | Package widget               |
 
+## Input types
+
+Some input types have their own daisyUI component. The effective `type`
+(an attribute passed to the widget or `{% daisy_field %}` first, then the
+widget's own `input_type`) is checked before the widget class:
+
+| Input `type` | daisyUI class | Notes                                              |
+| ------------ | ------------- | -------------------------------------------------- |
+| `range`      | `range`       | For example `NumberInput(attrs={"type": "range"})` |
+| `color`      | *None*        | Rendered without a component class                 |
+
 ## Error variants
 
 When a field has validation errors, the package appends `-error` to the base class:
@@ -40,6 +51,7 @@ When a field has validation errors, the package appends `-error` to the base cla
 - `radio` → `radio-error`
 - `toggle` → `toggle-error`
 - `file-input` → `file-input-error`
+- `range` → `range-error`
 
 ## Custom widgets
 
@@ -90,13 +102,22 @@ These render with the correct `type` attribute:
 
 ## How the registry works
 
-The registry lookup uses the widget's MRO:
+The lookup checks the input type first, then walks the widget's MRO:
 
 ```python
-def daisy_class_for(widget: Widget) -> str | None:
-    for cls in type(widget).__mro__:
-        if cls in WIDGET_CLASSES:
-            return WIDGET_CLASSES[cls]
+def daisy_class_for(widget: Widget, input_type: str | None = None) -> str | None:
+    effective_type = (
+        input_type or widget.attrs.get("type") or getattr(widget, "input_type", None)
+    )
+    if (
+        isinstance(widget, Input)
+        and effective_type is not None
+        and effective_type in INPUT_TYPE_CLASSES
+    ):
+        return INPUT_TYPE_CLASSES[effective_type]
+    for widget_type in type(widget).__mro__:
+        if widget_type in WIDGET_CLASSES:
+            return WIDGET_CLASSES[widget_type]
     return None
 ```
 
@@ -123,7 +144,7 @@ To style an unregistered widget:
 2. **Pass classes through attrs** — for completely custom widgets:
 
     ```python
-    widget=forms.TextInput(attrs={"class": "input"})
+    widget=MyWidget(attrs={"class": "input"})
     ```
 
 3. **Override the widget template** — if you need full control:
@@ -145,7 +166,7 @@ Third-party widgets with custom templates are left untouched.
 
 ## Registry source
 
-The registry is defined in `daisy_forms/classes.py`:
+The registry lives in `daisy_forms/classes.py`:
 
 ```python
 WIDGET_CLASSES: Final[Mapping[type[Widget], str | None]] = {
@@ -156,9 +177,19 @@ WIDGET_CLASSES: Final[Mapping[type[Widget], str | None]] = {
     Toggle: "toggle",
     CheckboxSelectMultiple: "checkbox",
     RadioSelect: "radio",
+    DateInput: "input",
+    DateTimeInput: "input",
+    TimeInput: "input",
     FileInput: "file-input",
     Input: "input",
 }
+
+INPUT_TYPE_CLASSES: Final[Mapping[str, str | None]] = {
+    "range": "range",
+    "color": None,
+}
 ```
 
-The `LAYOUT_CLASSES` frozenset contains every class literal used in package templates. This is used by the CSS management command to generate the `@source inline()` file.
+`LAYOUT_CLASSES` lists the layout classes used in the package templates. The
+`daisy_forms_css` command combines it with every component class and its
+`-error` variant to write the `@source inline()` file.

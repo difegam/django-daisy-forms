@@ -28,176 +28,109 @@ Template names are public API, and renames are breaking changes.
 
 ## Form templates
 
+The listings below are included from the package source, so they always match the released templates.
+
 ### `daisy_forms/form.html`
 
-Renders a complete form with non-field errors, visible fields, and hidden fields.
+Renders a form. The context is Django's form rendering context: `errors` (non-field errors, including hidden-field errors), `fields` (pairs of visible bound field and its errors), and `hidden_fields`.
 
 ```django
-{% if form.errors %}
-  {% if form.non_field_errors %}
-    <div role="alert" class="alert alert-error alert-soft">
-      <ul>
-        {% for error in form.non_field_errors %}
-          <li>{{ error }}</li>
-        {% endfor %}
-      </ul>
-    </div>
-  {% endif %}
-{% endif %}
-
-{% for field in form.visible_fields %}
-  {{ field.as_field_group }}
-{% endfor %}
-
-{% for field in form.hidden_fields %}
-  {{ field }}
-{% endfor %}
+--8<-- "src/daisy_forms/templates/daisy_forms/form.html"
 ```
 
 ### `daisy_forms/formset.html`
 
-Renders a formset with the management form, non-form errors, and each form.
+Renders a formset: the management form, non-form errors, then each form.
 
 ```django
-{{ formset.management_form }}
-
-{% if formset.non_form_errors %}
-  <div role="alert" class="alert alert-error alert-soft">
-    <ul>
-      {% for error in formset.non_form_errors %}
-        <li>{{ error }}</li>
-      {% endfor %}
-    </ul>
-  </div>
-{% endif %}
-
-{% for form in formset %}
-  {{ form }}
-{% endfor %}
+--8<-- "src/daisy_forms/templates/daisy_forms/formset.html"
 ```
 
 ## Field templates
 
 ### `daisy_forms/field.html`
 
-The default field template. Renders a single field with label, help text, errors, and control.
+The default field template. Single checkboxes and toggles render the control inside a `label`; grouped choices use a `fieldset` and `legend`; every other widget gets a `fieldset-legend` label followed by help text, errors, and the control.
 
 ```django
-{% if field.use_fieldset %}
-  <fieldset class="fieldset"{% if field.aria_describedby %} aria-describedby="{{ field.aria_describedby }}"{% endif %}>
-    <legend class="fieldset-legend">{{ field.label }}{% if field.field.required %}<span class="text-error" aria-hidden="true"> *</span>{% endif %}</legend>
-    {% include "daisy_forms/_field_meta.html" %}
-    {{ field }}
-  </fieldset>
-{% else %}
-  <div class="fieldset">
-    {% if field.field.widget.input_type == "checkbox" or field.field.widget.input_type == "toggle" %}
-      <label class="label" for="{{ field.id_for_label }}">
-        {{ field }}
-        {{ field.label }}{% if field.field.required %}<span class="text-error" aria-hidden="true"> *</span>{% endif %}
-      </label>
-    {% else %}
-      <label class="fieldset-legend" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<span class="text-error" aria-hidden="true"> *</span>{% endif %}</label>
-    {% endif %}
-    {% include "daisy_forms/_field_meta.html" %}
-    {% if field.field.widget.input_type != "checkbox" and field.field.widget.input_type != "toggle" %}
-      {{ field }}
-    {% endif %}
-  </div>
-{% endif %}
+--8<-- "src/daisy_forms/templates/daisy_forms/field.html"
 ```
 
 ### `daisy_forms/_field_meta.html`
 
-Renders help text and errors. Included by `field.html`.
+Renders help text and errors with the `{id}_helptext` and `{id}_error` ids that Django's `aria-describedby` references. Included by both field templates. If you override a field template, include it or render equivalent markup.
 
 ```django
-{% if field.help_text %}
-  <p class="label" id="{{ field.auto_id }}_helptext">{{ field.help_text }}</p>
-{% endif %}
-
-{% if field.errors %}
-  <ul class="text-error text-sm" id="{{ field.auto_id }}_error">
-    {% for error in field.errors %}
-      <li>{{ error }}</li>
-    {% endfor %}
-  </ul>
-{% endif %}
+--8<-- "src/daisy_forms/templates/daisy_forms/_field_meta.html"
 ```
-
-If you override `field.html`, you must also include or replace `_field_meta.html`.
 
 ### `daisy_forms/field_horizontal.html`
 
-Horizontal field layout. Label and control sit side by side at the `md` breakpoint.
+The opt-in horizontal layout. Label and control stack on narrow screens and sit side by side from the `md` breakpoint. Use it with `{% daisy_field form.email template="daisy_forms/field_horizontal.html" %}`.
 
 ```django
-<div class="fieldset sm:flex sm:items-start sm:gap-4">
-  <label class="fieldset-legend sm:w-1/3 sm:pt-2" for="{{ field.id_for_label }}">
-    {{ field.label }}{% if field.field.required %}<span class="text-error" aria-hidden="true"> *</span>{% endif %}
-  </label>
-  <div class="flex-1">
-    {% include "daisy_forms/_field_meta.html" %}
-    {{ field }}
-  </div>
-</div>
+--8<-- "src/daisy_forms/templates/daisy_forms/field_horizontal.html"
 ```
 
 ## Widget templates
 
+The renderer swaps these in on a copy of stock `RadioSelect`, `CheckboxSelectMultiple`, and `ClearableFileInput` widgets. Widgets with custom templates are left untouched.
+
 ### `daisy_forms/widgets/radio.html`
 
-Renders a `RadioSelect` widget.
+Renders a `RadioSelect` as a vertical list of options.
 
 ```django
-<div id="{{ widget.attrs.id }}" class="flex flex-col gap-2">
-  {% for group, options, index in widget.optgroups %}
-    {% for option in options %}
-      <label class="label" for="{{ option.attrs.id }}">
-        <input type="{{ option.type }}" name="{{ option.name }}" value="{{ option.value }}" class="radio{% if widget.attrs.class %} {{ widget.attrs.class }}{% endif %}"{% if option.selected %} checked{% endif %}{% for name, value in option.attrs.items %}{% if name != "id" and name != "type" and name != "name" and name != "value" and name != "class" %} {{ name }}="{{ value }}"{% endif %}{% endfor %} id="{{ option.attrs.id }}">
-        {{ option.label }}
-      </label>
-    {% endfor %}
-  {% endfor %}
-</div>
+--8<-- "src/daisy_forms/templates/daisy_forms/widgets/radio.html"
 ```
 
 ### `daisy_forms/widgets/radio_option.html`
 
-Renders a single radio option. Used by `radio.html`.
-
-### `daisy_forms/widgets/checkbox_select.html`
-
-Renders a `CheckboxSelectMultiple` widget. Similar to `radio.html` but with `checkbox` class.
-
-### `daisy_forms/widgets/checkbox_option.html`
-
-Renders a single checkbox option. Used by `checkbox_select.html`.
-
-### `daisy_forms/widgets/clearable_file_input.html`
-
-Renders a `ClearableFileInput` widget with the current file link and clear checkbox.
+Renders a single radio option inside its label.
 
 ```django
-{% if widget.value and widget.value.url %}
-  <div class="mb-2">
-    <a href="{{ widget.value.url }}" class="link">{{ widget.value.name }}</a>
-    <label class="label ml-4">
-      <input type="checkbox" name="{{ widget.name }}-clear" id="{{ widget.name }}-clear_id" class="checkbox checkbox-sm">
-      Clear
-    </label>
-  </div>
-{% endif %}
-<input type="{{ widget.type }}" name="{{ widget.name }}" class="file-input{% if widget.attrs.class %} {{ widget.attrs.class }}{% endif %}"{% for name, value in widget.attrs.items %}{% if name != "type" and name != "name" and name != "class" %} {{ name }}="{{ value }}"{% endif %}{% endfor %} id="{{ widget.attrs.id }}">
+--8<-- "src/daisy_forms/templates/daisy_forms/widgets/radio_option.html"
 ```
 
 ### `daisy_forms/widgets/radio_inline.html`
 
-Renders a `RadioSelect` widget with inline choices.
+Used for `choices="inline"`: the same options in a wrapping row.
+
+```django
+--8<-- "src/daisy_forms/templates/daisy_forms/widgets/radio_inline.html"
+```
+
+### `daisy_forms/widgets/checkbox_select.html`
+
+Renders a `CheckboxSelectMultiple` as a vertical list of options.
+
+```django
+--8<-- "src/daisy_forms/templates/daisy_forms/widgets/checkbox_select.html"
+```
+
+### `daisy_forms/widgets/checkbox_option.html`
+
+Renders a single checkbox option inside its label.
+
+```django
+--8<-- "src/daisy_forms/templates/daisy_forms/widgets/checkbox_option.html"
+```
 
 ### `daisy_forms/widgets/checkbox_select_inline.html`
 
-Renders a `CheckboxSelectMultiple` widget with inline choices.
+Used for `choices="inline"`: the same options in a wrapping row.
+
+```django
+--8<-- "src/daisy_forms/templates/daisy_forms/widgets/checkbox_select_inline.html"
+```
+
+### `daisy_forms/widgets/clearable_file_input.html`
+
+Renders a `ClearableFileInput` with the current file link and the clear checkbox.
+
+```django
+--8<-- "src/daisy_forms/templates/daisy_forms/widgets/clearable_file_input.html"
+```
 
 ## Overriding templates
 

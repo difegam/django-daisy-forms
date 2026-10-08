@@ -76,14 +76,14 @@ See [Layouts & addons](layouts-addons.md) for details on the horizontal template
 
 The following names are reserved and do not become widget attributes:
 
-| Option | Purpose |
-| --- | --- |
-| `label` | Overrides label text |
-| `label_class` | Appends classes to the label or legend |
-| `template` | Overrides the field template |
-| `choices` | Layout for radio/checkbox choices (`inline`) |
-| `prefix` | Text addon before the input |
-| `suffix` | Text addon after the input |
+| Option        | Purpose                                      |
+| ------------- | -------------------------------------------- |
+| `label`       | Overrides label text                         |
+| `label_class` | Appends classes to the label or legend       |
+| `template`    | Overrides the field template                 |
+| `choices`     | Layout for radio/checkbox choices (`inline`) |
+| `prefix`      | Text addon before the input                  |
+| `suffix`      | Text addon after the input                   |
 
 To set the HTML `prefix` attribute (RDFa), use widget `attrs` instead:
 

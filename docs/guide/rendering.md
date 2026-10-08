@@ -17,19 +17,19 @@ The `DaisyBoundField` looks up the widget's daisyUI class from a registry and ap
 
 Every Django widget gets a daisyUI component class:
 
-| Django widget | daisyUI class | Example |
-| --- | --- | --- |
-| `TextInput`, `EmailInput`, `URLInput`, `NumberInput`, `PasswordInput` | `input` | `<input class="input">` |
-| `Textarea` | `textarea` | `<textarea class="textarea">` |
-| `Select` | `select` | `<select class="select">` |
-| `CheckboxInput` | `checkbox` | `<input type="checkbox" class="checkbox">` |
-| `RadioSelect` | `radio` | `<input type="radio" class="radio">` |
-| `CheckboxSelectMultiple` | `checkbox` | `<input type="checkbox" class="checkbox">` |
-| `FileInput`, `ClearableFileInput` | `file-input` | `<input type="file" class="file-input">` |
-| `Toggle` (package widget) | `toggle` | `<input type="checkbox" class="toggle">` |
-| `NativeDateInput` | `input` | `<input type="date" class="input">` |
-| `NativeTimeInput` | `input` | `<input type="time" class="input">` |
-| `NativeDateTimeInput` | `input` | `<input type="datetime-local" class="input">` |
+| Django widget                                                         | daisyUI class | Example                                       |
+| --------------------------------------------------------------------- | ------------- | --------------------------------------------- |
+| `TextInput`, `EmailInput`, `URLInput`, `NumberInput`, `PasswordInput` | `input`       | `<input class="input">`                       |
+| `Textarea`                                                            | `textarea`    | `<textarea class="textarea">`                 |
+| `Select`                                                              | `select`      | `<select class="select">`                     |
+| `CheckboxInput`                                                       | `checkbox`    | `<input type="checkbox" class="checkbox">`    |
+| `RadioSelect`                                                         | `radio`       | `<input type="radio" class="radio">`          |
+| `CheckboxSelectMultiple`                                              | `checkbox`    | `<input type="checkbox" class="checkbox">`    |
+| `FileInput`, `ClearableFileInput`                                     | `file-input`  | `<input type="file" class="file-input">`      |
+| `Toggle` (package widget)                                             | `toggle`      | `<input type="checkbox" class="toggle">`      |
+| `NativeDateInput`                                                     | `input`       | `<input type="date" class="input">`           |
+| `NativeTimeInput`                                                     | `input`       | `<input type="time" class="input">`           |
+| `NativeDateTimeInput`                                                 | `input`       | `<input type="datetime-local" class="input">` |
 
 !!! note
 

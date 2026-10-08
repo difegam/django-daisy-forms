@@ -47,6 +47,10 @@ build:
 update:
     uv lock --upgrade && uv sync --all-groups
 
+[doc("Draft the changelog entry, version bump and release notes with Claude")]
+release-notes *args:
+    scripts/release-notes.sh {{args}}
+
 [doc("Bump the package patch version with uv")]
 bump-patch:
     uv version --bump patch

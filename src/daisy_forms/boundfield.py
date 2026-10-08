@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import re
 from collections.abc import Mapping
 from types import MappingProxyType
 from typing import Any, Final, cast
@@ -18,6 +19,11 @@ from .classes import WIDGET_CLASSES, daisy_class_for
 _SIZED_CLASSES: Final = frozenset({"input", "textarea", "select", "file-input"})
 _NON_TEXT_INPUT_TYPES: Final = frozenset(
     {"button", "checkbox", "file", "hidden", "image", "radio", "reset", "submit"}
+)
+# daisyUI input modifiers that text addons mirror so the joined group matches
+_ADDON_MODIFIER_RE: Final = re.compile(
+    r"^input-(?:xs|sm|md|lg|xl|neutral|primary|secondary|accent|info|success"
+    r"|warning|error|ghost)$"
 )
 
 # stock widget template -> (stock option, daisy template, daisy option)
@@ -218,13 +224,24 @@ class DaisyBoundField(BoundField):
         if not has_addons:
             return rendered_widget
 
+        input_classes = str(
+            self.build_widget_attrs(dict(merged_attrs), widget).get("class", "")
+        ).split()
+        addon_class = " ".join(
+            [
+                "input",
+                *(token for token in input_classes if _ADDON_MODIFIER_RE.match(token)),
+                "join-item",
+                "w-auto",
+            ]
+        )
         prefix = (
-            format_html('<span class="input join-item w-auto">{}</span>', self.prefix)
+            format_html('<span class="{}">{}</span>', addon_class, self.prefix)
             if self.prefix
             else ""
         )
         suffix = (
-            format_html('<span class="input join-item w-auto">{}</span>', self.suffix)
+            format_html('<span class="{}">{}</span>', addon_class, self.suffix)
             if self.suffix
             else ""
         )

@@ -6,28 +6,28 @@ django-daisy-forms maps Django widgets to daisyUI components through a class reg
 
 The class registry maps Django widget types to daisyUI component classes. The lookup uses the widget's MRO (method resolution order), so subclasses of registered widgets inherit the class.
 
-| Django widget | daisyUI class | Notes |
-| --- | --- | --- |
-| `HiddenInput` | *None* | No class applied |
-| `TextInput` | `input` | Base for text-like inputs |
-| `EmailInput` | `input` | Inherits from `TextInput` |
-| `URLInput` | `input` | Inherits from `TextInput` |
-| `NumberInput` | `input` | Inherits from `TextInput` |
-| `PasswordInput` | `input` | Inherits from `TextInput` |
-| `DateInput` | `input` | Inherits from `TextInput` |
-| `DateTimeInput` | `input` | Inherits from `TextInput` |
-| `TimeInput` | `input` | Inherits from `TextInput` |
-| `Textarea` | `textarea` | |
-| `Select` | `select` | Includes `NullBooleanSelect` |
-| `CheckboxInput` | `checkbox` | |
-| `RadioSelect` | `radio` | |
-| `CheckboxSelectMultiple` | `checkbox` | |
-| `FileInput` | `file-input` | |
-| `ClearableFileInput` | `file-input` | Custom package template |
-| `Toggle` | `toggle` | Package widget |
-| `NativeDateInput` | `input` | Package widget |
-| `NativeTimeInput` | `input` | Package widget |
-| `NativeDateTimeInput` | `input` | Package widget |
+| Django widget            | daisyUI class | Notes                        |
+| ------------------------ | ------------- | ---------------------------- |
+| `HiddenInput`            | *None*        | No class applied             |
+| `TextInput`              | `input`       | Base for text-like inputs    |
+| `EmailInput`             | `input`       | Inherits from `TextInput`    |
+| `URLInput`               | `input`       | Inherits from `TextInput`    |
+| `NumberInput`            | `input`       | Inherits from `TextInput`    |
+| `PasswordInput`          | `input`       | Inherits from `TextInput`    |
+| `DateInput`              | `input`       | Inherits from `TextInput`    |
+| `DateTimeInput`          | `input`       | Inherits from `TextInput`    |
+| `TimeInput`              | `input`       | Inherits from `TextInput`    |
+| `Textarea`               | `textarea`    |                              |
+| `Select`                 | `select`      | Includes `NullBooleanSelect` |
+| `CheckboxInput`          | `checkbox`    |                              |
+| `RadioSelect`            | `radio`       |                              |
+| `CheckboxSelectMultiple` | `checkbox`    |                              |
+| `FileInput`              | `file-input`  |                              |
+| `ClearableFileInput`     | `file-input`  | Custom package template      |
+| `Toggle`                 | `toggle`      | Package widget               |
+| `NativeDateInput`        | `input`       | Package widget               |
+| `NativeTimeInput`        | `input`       | Package widget               |
+| `NativeDateTimeInput`    | `input`       | Package widget               |
 
 ## Error variants
 

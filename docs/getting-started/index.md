@@ -6,12 +6,12 @@ Get django-daisy-forms running in under five minutes. This section covers instal
 
 Before you begin, make sure your project meets these requirements:
 
-| Requirement | Version |
-| --- | --- |
-| Python | 3.12 or later |
-| Django | 5.2, 6.0, or 6.1 |
-| Tailwind CSS | 4.1 or later |
-| daisyUI | 5.0.36 or later |
+| Requirement  | Version          |
+| ------------ | ---------------- |
+| Python       | 3.12 or later    |
+| Django       | 5.2, 6.0, or 6.1 |
+| Tailwind CSS | 4.1 or later     |
+| daisyUI      | 5.0.36 or later  |
 
 ## Installation
 
@@ -53,10 +53,10 @@ FORM_RENDERER = "daisy_forms.renderers.DaisyFormRenderer"
 
 After configuration, run `python manage.py check` to verify your setup:
 
-| Code | Severity | Meaning |
-| --- | --- | --- |
-| `daisy_forms.E001` | Error | `django.forms` is missing from `INSTALLED_APPS` |
-| `daisy_forms.W001` | Warning | `FORM_RENDERER` is not set to the daisy renderer |
+| Code               | Severity | Meaning                                          |
+| ------------------ | -------- | ------------------------------------------------ |
+| `daisy_forms.E001` | Error    | `django.forms` is missing from `INSTALLED_APPS`  |
+| `daisy_forms.W001` | Warning  | `FORM_RENDERER` is not set to the daisy renderer |
 
 ## Your first form
 
@@ -95,25 +95,25 @@ That's it — every field renders with the correct daisyUI component class (`inp
 
 <div class="grid cards" markdown>
 
--   :material-book-open-variant:{ .lg .middle } **Learn how it works**
+- :material-book-open-variant:{ .lg .middle } **Learn how it works**
 
-    ---
+    ______________________________________________________________________
 
     Understand the rendering mechanism, validation, and per-field control.
 
     [:octicons-arrow-right-24: Guide](../guide/index.md)
 
--   :material-code-tags:{ .lg .middle } **Explore the API**
+- :material-code-tags:{ .lg .middle } **Explore the API**
 
-    ---
+    ______________________________________________________________________
 
     Widget classes, template tags, and overridable templates.
 
     [:octicons-arrow-right-24: Reference](../reference/index.md)
 
--   :material-palette:{ .lg .middle } **Tailwind CSS setup**
+- :material-palette:{ .lg .middle } **Tailwind CSS setup**
 
-    ---
+    ______________________________________________________________________
 
     Generate the CSS source file for Tailwind.
 

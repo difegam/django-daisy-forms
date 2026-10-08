@@ -5,6 +5,7 @@ Thank you for your interest in contributing to django-daisy-forms! This guide wi
 ## Getting started
 
 1. Fork the repository on GitHub
+
 2. Clone your fork locally:
 
     ```bash
@@ -77,7 +78,9 @@ The CSS check ensures every class in the templates is included in the `@source i
     ```
 
 2. Open a pull request against the `main` branch
+
 3. Describe your changes and link any related issues
+
 4. Wait for CI to pass
 
 ## Code review

@@ -1,11 +1,14 @@
+[doc("Install all dependency groups and the Git hooks")]
 init:
     uv sync --locked --all-groups
     uv run prek install --hook-type pre-commit --hook-type pre-push --hook-type commit-msg
 
+[doc("Remove the virtualenv, caches, and build output")]
 clean:
     rm -rf .venv .pytest_cache .ruff_cache .mypy_cache .coverage htmlcov site dist
     find . -type d -name "__pycache__" -exec rm -rf {} +
 
+[doc("Rebuild the environment from scratch")]
 fresh: clean init
 
 format-check:
@@ -72,8 +75,9 @@ bump-minor:
 bump-major:
     uv version --bump major
 
+[doc("Run every local check that CI runs")]
 [group("ci")]
-verify: check css-check build doc-build
+verify: check css-check build doc-build doc-format-check
 
 # Documentation
 [doc("Preview documentation locally")]
@@ -89,4 +93,9 @@ doc-build:
 [doc("Format documentation markdown files")]
 [group("docs")]
 doc-format:
-    uvx --with mdformat-frontmatter --with mdformat-gfm --with mdformat-mkdocs mdformat docs
+    uvx --from mdformat==1.0.0 --with mdformat-gfm==1.0.0 --with mdformat-front-matters==2.0.0 --with mdformat-footnote==0.1.3 --with mdformat-mkdocs==5.3.0 mdformat --number docs
+
+[doc("Check documentation markdown formatting")]
+[group("docs")]
+doc-format-check:
+    uvx --from mdformat==1.0.0 --with mdformat-gfm==1.0.0 --with mdformat-front-matters==2.0.0 --with mdformat-footnote==0.1.3 --with mdformat-mkdocs==5.3.0 mdformat --number --check docs

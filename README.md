@@ -244,10 +244,12 @@ Install [uv](https://docs.astral.sh/uv/) and [Just](https://just.systems/),
 then run:
 
 ```bash
-uv sync --all-groups
-uv run prek install
+just init
 just check
 ```
+
+`just init` installs every dependency group and the pre-commit, pre-push, and
+commit-msg hooks. `just fresh` removes the environment and caches first.
 
 The available commands are:
 
@@ -260,7 +262,17 @@ just css-check  Build the Tailwind and daisyUI fixture.
 just css-preview  Build the fixture CSS for the browser preview.
 just check      Run formatting, linting, type checks, and tests.
 just build      Build wheel and source-distribution artifacts.
+just verify     Run every check CI runs: check, css-check, build, and docs.
 just release-notes  Draft the next release's changelog and notes with Claude.
+
+just init       Install all dependency groups and the Git hooks.
+just clean      Remove the virtualenv, caches, and build output.
+just fresh      Run clean, then init.
+
+just doc-serve         Preview the documentation site locally.
+just doc-build         Build the documentation, failing on warnings.
+just doc-format        Format the docs Markdown with mdformat.
+just doc-format-check  Check the docs Markdown formatting.
 
 just browser-setup    Install Playwright, Chromium, and the browser CLI.
 just browser-test     Run the opt-in browser checks for form layouts.
@@ -283,9 +295,11 @@ To inspect the live preview with the pinned Playwright CLI, run `just
 browser-preview` in one terminal and `just browser-cli` in another. The browser
 checks are opt-in and stay out of the default test and CI runs.
 
-Prek runs Ruff and whitespace, YAML, and TOML checks before commits. CI runs
-the declared Django and Python matrix, builds both release artifacts, and smoke
-tests them in isolated environments.
+Prek runs Ruff, djlint, codespell, shellcheck, bandit, and file checks before
+commits, validates commit messages, and runs strict mypy, coverage, and link
+checks before pushes. CI runs the declared Django and Python matrix, builds
+both release artifacts and smoke tests them in isolated environments, checks
+the Tailwind fixture, and builds the documentation strictly.
 
 <details>
 <summary><strong>Releasing</strong></summary>

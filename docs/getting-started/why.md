@@ -12,11 +12,11 @@ Django's built-in form rendering is clean but unstyled. To get styled forms, mos
 
 For daisyUI specifically, existing options are limited:
 
-| Package | Status | Approach |
-| --- | --- | --- |
-| crispy-tailwind | Unmaintained since Feb 2024 | Plain Tailwind utilities, not daisyUI |
-| crispy-daisyui | Low activity | Requires crispy, fork of crispy-tailwind |
-| django-mvp-forms | Pre-release | Requires crispy |
+| Package          | Status                      | Approach                                 |
+| ---------------- | --------------------------- | ---------------------------------------- |
+| crispy-tailwind  | Unmaintained since Feb 2024 | Plain Tailwind utilities, not daisyUI    |
+| crispy-daisyui   | Low activity                | Requires crispy, fork of crispy-tailwind |
+| django-mvp-forms | Pre-release                 | Requires crispy                          |
 
 ## The approach
 

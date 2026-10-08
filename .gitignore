@@ -25,5 +25,14 @@ tests/tailwind/daisy-forms.css
 tests/tailwind/output.css
 tests/tailwind/preview-output.css
 
-# Local planning notes
+# Local planning notes and release drafts
 docs/superpowers/
+.release/
+
+# Zensical documentation
+site/
+
+docs/superpowers/.*
+
+# Local agent notes
+.opencode/

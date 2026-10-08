@@ -9,6 +9,11 @@ release.
 
 ## [Unreleased]
 
+### Added
+
+- `just release-notes`, which drafts the version bump, CHANGELOG entry, and
+  GitHub release notes from git history with `claude -p`.
+
 ## [0.1.0] - 2026-10-08
 
 First public release.

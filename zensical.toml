@@ -38,6 +38,7 @@ nav = [
         { Overview = "recipes/index.md" },
         { "HTMX Form Validation" = "recipes/htmx-form-validation.md" },
     ] },
+    { "AI Integration" = "ai-integration.md" },
     { Development = [
         { Overview = "development/index.md" },
         { Contributing = "development/contributing.md" },

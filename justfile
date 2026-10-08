@@ -20,6 +20,21 @@ css-check:
     npm --prefix tests/tailwind run build
     uv run python tests/tailwind/check_css.py
 
+browser-setup:
+    uv sync --locked --group dev --group browser
+    uv run playwright install chromium
+    npm ci --prefix tests/browser-cli
+    npm --prefix tests/browser-cli exec -- playwright-cli install-browser chromium
+
+browser-test: css-check
+    uv run pytest --override-ini addopts= -m browser tests/browser
+
+browser-preview: css-check
+    PYTHONPATH=. uv run django-admin runserver --skip-checks --settings=tests.settings 127.0.0.1:8000
+
+browser-cli:
+    npm --prefix tests/browser-cli exec -- playwright-cli open http://127.0.0.1:8000/__preview__/ --headed
+
 check: format-check lint typecheck test
 
 build:

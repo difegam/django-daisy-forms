@@ -1,11 +1,11 @@
-{% if field.field.widget.input_type == "checkbox" and not field.use_fieldset %}<div class="fieldset gap-2 md:flex-row md:items-start md:gap-6">
+{% if field.field.widget.input_type == "checkbox" and not field.use_fieldset %}<div class="fieldset gap-2 md:flex md:flex-row md:items-start md:gap-6">
 <label class="label md:w-48 md:shrink-0" for="{{ field.id_for_label }}">{{ field }} {{ field.label }}{% if field.field.required %}<span class="text-error" aria-hidden="true"> *</span>{% endif %}</label>
 <div class="flex min-w-0 flex-1 flex-col gap-2">{% include "daisy_forms/_field_meta.html" %}</div></div>
-{% elif field.use_fieldset %}<fieldset class="fieldset gap-2 md:flex-row md:items-start md:gap-6"{% if field.aria_describedby %} aria-describedby="{{ field.aria_describedby }}"{% endif %}>
+{% elif field.use_fieldset %}<fieldset class="fieldset gap-2 md:flex md:flex-row md:items-start md:gap-6"{% if field.aria_describedby %} aria-describedby="{{ field.aria_describedby }}"{% endif %}>
 {% if field.label %}<legend class="fieldset-legend md:w-48 md:shrink-0">{{ field.label }}{% if field.field.required %}<span class="text-error" aria-hidden="true"> *</span>{% endif %}</legend>{% endif %}
 <div class="flex min-w-0 flex-1 flex-col gap-2">{% include "daisy_forms/_field_meta.html" %}{{ field }}</div>
 </fieldset>
-{% else %}<div class="fieldset gap-2 md:flex-row md:items-start md:gap-6">
+{% else %}<div class="fieldset gap-2 md:flex md:flex-row md:items-start md:gap-6">
 {% if field.label %}<label class="fieldset-legend md:w-48 md:shrink-0" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<span class="text-error" aria-hidden="true"> *</span>{% endif %}</label>{% endif %}
 <div class="flex min-w-0 flex-1 flex-col gap-2">{% include "daisy_forms/_field_meta.html" %}{{ field }}</div>
 </div>{% endif %}

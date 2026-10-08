@@ -46,11 +46,14 @@ dev = [
     { include-group = "lint" },
     { include-group = "type" },
 ]
+browser = ["playwright==1.63.0"]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "tests.settings"
 pythonpath = [".", "src"]
 testpaths = ["tests"]
+addopts = "-m 'not browser'"
+markers = ["browser: optional local browser checks requiring Playwright and Chromium"]
 
 [tool.coverage.run]
 branch = true

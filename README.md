@@ -244,6 +244,18 @@ just build      Build wheel and source-distribution artifacts.
 Run `just update` to upgrade the lockfile within declared dependency
 constraints and sync all development groups.
 
+For optional local browser validation of the form layouts, use Node 20 or later,
+install the browser tools and Chromium, then run the browser checks:
+
+```bash
+just browser-setup
+just browser-test
+```
+
+To inspect the live preview with the pinned Playwright CLI, run `just
+browser-preview` in one terminal and `just browser-cli` in another. The browser
+checks are opt-in and stay out of the default test and CI runs.
+
 Prek runs Ruff and whitespace, YAML, and TOML checks before commits. CI runs
 the declared Django and Python matrix, builds both release artifacts, and smoke
 tests them in isolated environments.

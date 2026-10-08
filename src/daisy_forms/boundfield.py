@@ -80,7 +80,9 @@ def _uses_registered_stock_template(widget: Widget) -> bool:
             widget_type.__module__ == "django.forms.widgets"
             and "template_name" in widget_type.__dict__
         ):
-            return template_name == widget_type.template_name
+            return template_name == cast(
+                str | None, getattr(widget_type, "template_name", None)
+            )
     return False
 
 
@@ -130,7 +132,7 @@ class DaisyBoundField(BoundField):
         )
         has_addons = bool(self.prefix or self.suffix)
         if base_class == "input" and has_addons:
-            classes = [token for token in classes if token != "w-full"]
+            classes = [class_name for class_name in classes if class_name != "w-full"]
             if "join-item" not in classes:
                 classes.append("join-item")
             if "flex-1" not in classes:
@@ -174,9 +176,10 @@ class DaisyBoundField(BoundField):
             base_class = daisy_class_for(
                 widget, str(input_type) if input_type is not None else None
             )
-            is_non_text_input = isinstance(widget, Input) and str(
-                input_type or ""
-            ) in _NON_TEXT_INPUT_TYPES
+            is_non_text_input = (
+                isinstance(widget, Input)
+                and str(input_type or "") in _NON_TEXT_INPUT_TYPES
+            )
             if (
                 not _uses_registered_stock_template(widget)
                 or widget.is_hidden

@@ -1,0 +1,31 @@
+{% load daisy_forms %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>django-daisy-forms browser preview</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="{% url 'form_preview_css' %}">
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; padding: 2rem; }
+    main { margin: 0 auto; max-width: 60rem; }
+    form { display: flex; flex-direction: column; gap: 1.5rem; }
+    h1 { font-size: 1.5rem; margin: 0 0 1.5rem; }
+    button { align-self: flex-start; padding: 0.65rem 1rem; }
+    @media (max-width: 480px) { body { padding: 1rem; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Form layout preview</h1>
+    <form method="post" action="{% url 'form_preview' %}">
+      {% daisy_field form.email template="daisy_forms/field_horizontal.html" %}
+      {% daisy_field form.plan choices="inline" %}
+      {% daisy_field form.features choices="inline" %}
+      {% daisy_field form.price prefix="$" suffix="USD" %}
+      <button type="submit">Validate fields</button>
+    </form>
+  </main>
+</body>
+</html>

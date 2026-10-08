@@ -266,7 +266,7 @@ src/daisy_forms/
 tests/  golden/<widget>__<state>.html  test_*.py  tailwind/{input.css,package.json}
 noxfile.py → NOT used; matrix lives in CI via `uv run --with "django~=X.Y"`
 ```
-Tooling: `uv sync`, `uv run pytest`, `uv run mypy --strict src` (django-stubs plugin), `uv run ruff check && ruff format --check`, `uv build`. Bash scripts only in `scripts/` (e.g. `scripts/tailwind-check.sh`).
+Tooling: `uv sync`, `uv run pytest`, `uv run mypy --strict src` (django-stubs plugin), `uv run ruff check && ruff format --check`, `uv build`. Optional local visual checks use `just browser-setup`, `just browser-test`, `just browser-preview`, and `just browser-cli`; marked browser checks are excluded from default test and CI runs.
 
 ## 9. Testing & CI contract
 - **Unit/golden:** pytest + pytest-django. Scalar, checkbox, grouped-choice and clearable-file fields are compared with canonical golden HTML using `assertHTMLEqual`; specialised tests cover widget classes, error states, disabled fields and attribute handling. Golden files are the markup contract in §5.

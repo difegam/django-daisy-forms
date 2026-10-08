@@ -8,6 +8,36 @@ class TagForm(forms.Form):
     email = forms.EmailField()
 
 
+class LayoutTagForm(forms.Form):
+    email = forms.EmailField()
+    plan = forms.ChoiceField(
+        choices=[("basic", "Basic"), ("pro", "Pro")],
+        widget=forms.RadioSelect,
+    )
+    features = forms.MultipleChoiceField(
+        choices=[("reports", "Reports"), ("exports", "Exports")],
+        widget=forms.CheckboxSelectMultiple,
+    )
+    price = forms.DecimalField()
+
+
+class CustomTemplateRadio(forms.RadioSelect):
+    option_template_name = "custom/radio_option.html"
+
+
+class CustomTemplateInput(forms.TextInput):
+    template_name = "custom/text_input.html"
+
+
+class UnsupportedAddonForm(forms.Form):
+    checkbox = forms.BooleanField(required=False)
+    hidden = forms.CharField(widget=forms.HiddenInput)
+    textarea = forms.CharField(widget=forms.Textarea)
+    upload = forms.FileField(required=False)
+    plan = forms.ChoiceField(choices=[("basic", "Basic")], widget=forms.RadioSelect)
+    custom = forms.CharField(widget=CustomTemplateInput)
+
+
 @override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
 def test_daisy_field_tag_adds_attributes_without_mutating_form() -> None:
     form = TagForm()
@@ -22,6 +52,123 @@ def test_daisy_field_tag_adds_attributes_without_mutating_form() -> None:
     assert 'hx-post="/validate/email/"' in output
     assert "Work email" in output
     assert form.fields["email"].widget.attrs == original_attrs
+
+
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_daisy_field_tag_renders_horizontal_field_layout() -> None:
+    output = Template(
+        "{% load daisy_forms %}{% daisy_field form.email "
+        'template="daisy_forms/field_horizontal.html" %}'
+    ).render(Context({"form": LayoutTagForm()}))
+
+    assert "md:flex md:flex-row" in output
+    assert '<label class="fieldset-legend md:w-48 md:shrink-0"' in output
+
+
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_daisy_field_tag_renders_inline_choices_without_mutating_widgets() -> None:
+    form = LayoutTagForm()
+    original_templates = {
+        name: field.widget.template_name for name, field in form.fields.items()
+    }
+
+    output = Template(
+        '{% load daisy_forms %}{% daisy_field form.plan choices="inline" %}'
+        '{% daisy_field form.features choices="inline" %}'
+    ).render(Context({"form": form}))
+
+    assert output.count('class="flex flex-row flex-wrap gap-2"') == 2
+    assert 'type="radio"' in output
+    assert 'type="checkbox"' in output
+    assert form.fields["plan"].widget.template_name == original_templates["plan"]
+    assert (
+        form.fields["features"].widget.template_name == original_templates["features"]
+    )
+
+
+@pytest.mark.parametrize("layout", ["stacked", "columns"])
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_daisy_field_tag_rejects_unknown_choice_layout(layout: str) -> None:
+    template = Template(
+        f'{{% load daisy_forms %}}{{% daisy_field form.plan choices="{layout}" %}}'
+    )
+
+    with pytest.raises(TemplateSyntaxError, match="choices must be set"):
+        template.render(Context({"form": LayoutTagForm()}))
+
+
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_daisy_field_tag_rejects_inline_choices_on_unsupported_widgets() -> None:
+    template = Template(
+        '{% load daisy_forms %}{% daisy_field form.email choices="inline" %}'
+    )
+
+    with pytest.raises(TemplateSyntaxError, match="stock RadioSelect"):
+        template.render(Context({"form": LayoutTagForm()}))
+
+
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_daisy_field_tag_rejects_inline_custom_option_templates() -> None:
+    class FormWithCustomRadio(forms.Form):
+        plan = forms.ChoiceField(
+            choices=[("basic", "Basic")], widget=CustomTemplateRadio
+        )
+
+    template = Template(
+        '{% load daisy_forms %}{% daisy_field form.plan choices="inline" %}'
+    )
+
+    with pytest.raises(TemplateSyntaxError, match="stock RadioSelect"):
+        template.render(Context({"form": FormWithCustomRadio()}))
+
+
+@pytest.mark.parametrize(
+    "field_name",
+    ["checkbox", "hidden", "textarea", "upload", "plan", "custom"],
+)
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_daisy_field_tag_rejects_addons_for_unsupported_widgets(
+    field_name: str,
+) -> None:
+    template = Template(
+        f'{{% load daisy_forms %}}{{% daisy_field form.{field_name} prefix="$" %}}'
+    )
+
+    with pytest.raises(TemplateSyntaxError, match="require a stock widget"):
+        template.render(Context({"form": UnsupportedAddonForm()}))
+
+
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_daisy_field_tag_rejects_non_input_type_override_for_addons() -> None:
+    template = Template(
+        '{% load daisy_forms %}{% daisy_field form.email prefix="$" type="range" %}'
+    )
+
+    with pytest.raises(TemplateSyntaxError, match="require a stock widget"):
+        template.render(Context({"form": LayoutTagForm()}))
+
+
+@override_settings(FORM_RENDERER="daisy_forms.renderers.DaisyFormRenderer")
+def test_daisy_field_tag_renders_escaped_prefix_and_suffix_addons() -> None:
+    output = Template(
+        "{% load daisy_forms %}{% daisy_field form.price prefix=prefix suffix=suffix %}"
+    ).render(
+        Context(
+            {
+                "form": LayoutTagForm(),
+                "prefix": "<strong>$</strong>",
+                "suffix": "USD",
+            }
+        )
+    )
+
+    assert '<div class="join w-full">' in output
+    assert (
+        '<span class="input join-item">&lt;strong&gt;$&lt;/strong&gt;</span>' in output
+    )
+    assert '<span class="input join-item">USD</span>' in output
+    assert 'class="input join-item flex-1"' in output
+    assert "<strong>" not in output
 
 
 @pytest.mark.parametrize(

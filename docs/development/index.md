@@ -33,6 +33,7 @@ just update     Upgrade the lockfile within declared constraints.
 
 just doc-serve         Preview the documentation site locally.
 just doc-build         Build the documentation, failing on warnings.
+just doc-llms          Generate llms.txt and page markdown into site/ (after doc-build).
 just doc-format        Format the docs Markdown with mdformat.
 just doc-format-check  Check the docs Markdown formatting.
 
@@ -90,6 +91,7 @@ The site is built with [Zensical](https://zensical.org/) from `docs/` and `zensi
 just doc-serve         # Live preview at http://localhost:8000
 just doc-format        # Format the Markdown
 just doc-build         # Strict build; fails on warnings
+just doc-llms          # Generate site/llms.txt (run after doc-build)
 ```
 
-The changelog page includes the repository's `CHANGELOG.md`, and the template reference includes the package templates directly, so neither needs to be copied by hand.
+The changelog page includes the repository's `CHANGELOG.md`, and the template reference includes the package templates directly, so neither needs to be copied by hand. `scripts/llms-txt.sh` builds `llms.txt` from the `nav` in `zensical.toml` and copies each page's Markdown next to it, so the file stays in sync with the docs and is published by the same workflow.

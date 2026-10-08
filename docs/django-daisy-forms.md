@@ -162,7 +162,8 @@ Stock `DateInput` and the other stock widgets keep Django's defaults (`type="tex
 - Grammar: `{% daisy_field <bound_field> (<name>(=|+=)<expr>)* %}`. Names match `^[A-Za-z_][A-Za-z0-9_:.\-]*$`. Values are template expressions.
 - Reserved names: `label` (overrides label text), `template` (field group template), `choices` (`inline` for stock `RadioSelect` and `CheckboxSelectMultiple`), and `prefix`/`suffix` (escaped text for stock widgets rendered with daisyUI's `input` component). Every other name becomes a widget attribute. `class=` and `class+=` both **append** to daisy classes; `+=` is accepted for parity with django-widget-tweaks and is rejected on any other name.
 - `choices` accepts only `inline`; unsupported values, widget types, or custom choice templates MUST raise `TemplateSyntaxError`. The default choice layout remains vertical.
-- `prefix` and `suffix` MUST only be accepted for stock, visible, single-line widgets rendered with daisyUI's `input` component. Hidden, checkbox, radio, file, range, color, and custom-template widgets are rejected. Text addons MUST be escaped and MUST NOT accept HTML or icon markup.
+- `prefix` and `suffix` MUST only be accepted for stock, visible, single-line widgets rendered with daisyUI's `input` component. Hidden, checkbox, radio, file, range, color, and custom-template widgets are rejected. Text addons MUST be escaped and MUST NOT accept HTML or icon markup. Addons MUST mirror the control's daisyUI `input-*` size, colour and error modifiers so the joined group renders as one control.
+- `choices`, `prefix` and `suffix` became reserved when the layout options were added; earlier builds passed them through as widget attributes. Set the HTML `prefix` attribute (RDFa) through widget `attrs` instead.
 - MUST raise `TemplateSyntaxError` (case-insensitively) for inline-handler names (`on*`, `hx-on*`, `x-on*`, `x-init`, with an optional `data-` prefix) and for `aria-invalid`/`aria-describedby`.
 - MUST raise `ValueError` at render time when the argument does not resolve to a bound field (for example a mistyped field name).
 - Renders `copy.copy(bf)` with overrides through `as_field_group()` (or the template override). It never mutates the form.
@@ -191,7 +192,7 @@ Template names are public API, and renames are breaking changes.
 
 ## 5. Markup contract (daisyUI 5)
 
-`field_horizontal.html` preserves the field markup and accessibility rules below while placing the label beside the control at larger breakpoints. The default `field.html` remains unchanged. `choices="inline"` swaps only the outer container of stock radio and checkbox choice widgets to a wrapping row.
+`field_horizontal.html` preserves the field markup and accessibility rules below while placing the label beside the control at larger breakpoints. The default `field.html` remains unchanged. `choices="inline"` swaps only the outer container of stock radio and checkbox choice widgets to a wrapping row. Text addons wrap the control in `<div class="join w-full">`; each addon is `<span class="input … join-item w-auto">` carrying the same daisyUI `input-*` size, colour and error modifiers as the control (for example `input-sm`, `input-primary`, `input-error`), and the control drops `w-full` for `join-item flex-1`.
 
 Rules that apply to every field:
 - The wrapper is `<div class="fieldset">` for single controls and `<fieldset class="fieldset">` + `<legend class="fieldset-legend">` when `field.use_fieldset` (RadioSelect and CheckboxSelectMultiple; `ClearableFileInput` is `False` on 5.2, 6.0 and 6.1, but the template reads `field.use_fieldset`, so it follows Django).
@@ -272,7 +273,7 @@ Tooling: `uv sync`, `uv run pytest`, `uv run mypy --strict src` (django-stubs pl
 - **Unit/golden:** pytest + pytest-django. Scalar, checkbox, grouped-choice and clearable-file fields are compared with canonical golden HTML using `assertHTMLEqual`; specialised tests cover widget classes, error states, disabled fields and attribute handling. Golden files are the markup contract in §5.
 - **A11y invariants (programmatic):** for every rendered field, each id in `aria-describedby` exists in the output; invalid visible controls carry `aria-invalid="true"`; every visible control has a `<label for>` or sits inside a `<fieldset>` with a `<legend>`.
 - **Registry test:** the template-class scan is a subset of `all_classes()` (§6.1).
-- **CSS job:** install `tailwindcss`, `@tailwindcss/cli` and `daisyui@5` via npm. Build `tests/tailwind/input.css` (imports the generated file and has no `@source` to site-packages). Assert compiled CSS contains a selector for every class in `all_classes()`.
+- **CSS job:** install `tailwindcss`, `@tailwindcss/cli` and `daisyui@5` via npm, as a matrix over the supported floor (daisyUI 5.0.36) and the locked fixture version (5.7.47). Build `tests/tailwind/input.css` (imports the generated file and has no `@source` to site-packages). Assert compiled CSS contains a selector for every class in `all_classes()`.
 - **Matrix:** GitHub Actions over Python {3.12, 3.13, 3.14} × Django {5.2, 6.0, 6.1}, plus a `main` (allowed-failure) job.
 - **Admin smoke test:** render a `ModelAdmin` change form under `DaisyFormRenderer`; it MUST not raise, and the diff vs the stock renderer is limited to added `class` tokens.
 - **Release gate:** all jobs green, `uv build` produces a wheel that contains templates and `py.typed`, and the version is in the CHANGELOG.
@@ -293,10 +294,10 @@ Tooling: `uv sync`, `uv run pytest`, `uv run mypy --strict src` (django-stubs pl
   - Verify: admin impact; `select[multiple]` styling; whether daisyUI emits component CSS without detection; `@source inline()` inside an imported file.
 - **P0 (0.1.0):** all §5 widgets, formsets, the tag, the widgets module, the command, checks, docs and full CI.
 - **P1 (0.2.x):**
-  - `field_horizontal.html`, inline choice layouts, and text prefix/suffix addons;
-  - README examples for the opt-in field layouts and addons;
+  - Done (unreleased): `field_horizontal.html`, inline choice layouts, and text prefix/suffix addons;
+  - Done (unreleased): README examples for the opt-in field layouts and addons;
+  - Done (unreleased): optional local Playwright browser checks (`just browser-test`); axe is still open;
   - MultiWidget/SplitDateTime templates;
-  - optional Playwright + axe job;
   - htmx 4 recipes (inline validation, `hx-target` field group, `422` swaps) and a Django 6 partials recipe;
   - documented size and colour class recipes.
 - **P2 (not committed):** autocomplete, pickers, dynamic formsets, multistep. Each needs a separate proposal.

@@ -105,3 +105,5 @@ Render `{{ form }}` as usual — every field now renders with daisyUI markup.
 | Django       | 5.2, 6.0, 6.1   |
 | Tailwind CSS | 4.1 or later    |
 | daisyUI      | 5.0.36 or later |
+
+<span class="dd-home"></span>

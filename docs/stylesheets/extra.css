@@ -1,0 +1,7 @@
+/* The home page has no section sidebar, so drop the empty column that
+   offsets the hero to the right on wide screens. */
+@media (min-width: 76.25em) {
+    .md-main__inner:has(.dd-home) .md-sidebar--primary {
+        display: none;
+    }
+}

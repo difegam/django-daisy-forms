@@ -2,6 +2,8 @@
 
 For one-off fields, the `{% daisy_field %}` template tag lets you customize classes, labels, templates, and attributes without touching the form class.
 
+![The daisy_field tag renders an input with input-sm and hx attributes, then a field with onclick fails with TemplateSyntaxError: Attribute is not allowed: onclick](../assets/demo/field.gif)
+
 ## Basic usage
 
 Load the tag library and pass the bound field:
@@ -119,7 +121,7 @@ Passing a non-bound-field argument raises a `ValueError` at render time:
 ```
 
 ```text
-ValueError: ...
+ValueError: {% daisy_field %} expected a bound field, got ''.
 ```
 
 ## How it works
@@ -146,4 +148,8 @@ class MyForm(forms.Form):
     email.bound_field_class = BoundField  # Opt out
 ```
 
-An opted-out field cannot be passed to `{% daisy_field %}`. Render it with `{{ field }}` instead.
+An opted-out field cannot be passed to `{% daisy_field %}`. Render it with `{{ field }}` instead. Passing it to the tag raises:
+
+```text
+TemplateSyntaxError: {% daisy_field %} cannot be used on a field that opts out of DaisyBoundField (a plain BoundField opts out); render it with {{ field }} instead.
+```

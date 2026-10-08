@@ -2,6 +2,8 @@
 
 The package uses daisyUI component classes, so any daisyUI theme applies through `data-theme` with nothing to configure in the package.
 
+![The same signup form switching between the dark, cupcake, synthwave, nord, and retro daisyUI themes](../assets/demo/themes.gif)
+
 ## Applying a theme
 
 Set `data-theme` on the `<html>` element or any container:

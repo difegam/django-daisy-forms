@@ -21,7 +21,7 @@
   <img alt="Tailwind CSS 4.1+" src="https://img.shields.io/badge/tailwind-4.1%2B-38BDF8">
   <a href="https://difegam.github.io/django-daisy-forms/"><img alt="Documentation" src="https://img.shields.io/badge/docs-difegam.github.io-4F46E5"></a>
   <a href="https://github.com/difegam/django-daisy-forms/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/difegam/django-daisy-forms/actions/workflows/ci.yml/badge.svg"></a>
-  <a href="https://deepwiki.com/difegam/django-daisy-forms"><img alt="Ask DeepWiki" src="https://deepwiki.com/badge.svg"></a>
+  <a href="https://deepwiki.com/difegam/django-daisy-forms"><img alt="Ask DeepWiki" src="https://img.shields.io/badge/Ask-DeepWiki-20B2AA"></a>
   <a href="https://github.com/difegam/django-daisy-forms/blob/main/LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/license-MIT-9B8CFF"></a>
 </p>
 
@@ -274,95 +274,19 @@ dependencies of the project that consumes this package.
 
 ## Development
 
-Install [uv](https://docs.astral.sh/uv/) and [Just](https://just.systems/),
-then run:
+Install [uv](https://docs.astral.sh/uv/) and [Just](https://just.systems/), then
+run:
 
 ```bash
-just init
-just check
+just init    # install every dependency group and the Git hooks
+just check   # format check, lint, strict type check, and tests
+just         # list every recipe with its description
 ```
 
-`just init` installs every dependency group and the pre-commit, pre-push, and
-commit-msg hooks. `just fresh` removes the environment and caches first.
-
-The available commands are:
-
-```text
-just format     Format Python files with Ruff.
-just lint       Run Ruff linting.
-just typecheck  Run strict mypy with django-stubs.
-just test       Run pytest.
-just css-check  Build the Tailwind and daisyUI fixture.
-just css-preview  Build the fixture CSS for the browser preview.
-just check      Run formatting, linting, type checks, and tests.
-just build      Build wheel and source-distribution artifacts.
-just verify     Run every check CI runs: check, css-check, build, and docs.
-just release-notes  Draft the next release's changelog and notes with Claude.
-
-just init       Install all dependency groups and the Git hooks.
-just clean      Remove the virtualenv, caches, and build output.
-just fresh      Run clean, then init.
-
-just doc-serve         Preview the documentation site locally.
-just doc-build         Build the documentation, failing on warnings.
-just doc-format        Format the docs Markdown with mdformat.
-just doc-format-check  Check the docs Markdown formatting.
-
-just browser-setup    Install Playwright, Chromium, and the browser CLI.
-just browser-test     Run the opt-in browser checks for form layouts.
-just browser-preview  Serve the layout preview at 127.0.0.1:8000/__preview__/.
-just browser-cli      Open the preview in the pinned Playwright CLI.
-```
-
-Run `just update` to upgrade the lockfile within declared dependency
-constraints and sync all development groups.
-
-For optional local browser validation of the form layouts, use Node 20 or later,
-install the browser tools and Chromium, then run the browser checks:
-
-```bash
-just browser-setup
-just browser-test
-```
-
-To inspect the live preview with the pinned Playwright CLI, run `just
-browser-preview` in one terminal and `just browser-cli` in another. The browser
-checks are opt-in and stay out of the default test and CI runs.
-
-Prek runs Ruff, djlint, codespell, shellcheck, bandit, and file checks before
-commits, validates commit messages, and runs strict mypy, coverage, and link
-checks before pushes. CI runs the declared Django and Python matrix, builds
-both release artifacts and smoke tests them in isolated environments, checks
-the Tailwind fixture, and builds the documentation strictly.
-
-<details>
-<summary><strong>Releasing</strong></summary>
-
-Run `just release-notes` to draft the release with the
-[Claude Code](https://docs.claude.com/en/docs/claude-code) CLI. The script
-collects the commits, diffs, and CHANGELOG sections since the latest tag, then
-runs `claude -p` with all tools disabled. It writes a suggested version bump, a
-CHANGELOG entry, and GitHub release notes to `.release/release.md`. Pass
-`--dry-run` to write only the context and prompt, or `--from`/`--to` to choose
-the range.
-
-Review the draft, add its entries to CHANGELOG.md under a
-`## [X.Y.Z] - YYYY-MM-DD` heading, and update the link references. Then run
-`just bump-patch`, `just bump-minor`, or `just bump-major` to update the
-package version and lockfile. Then run `just skill-refresh` and paste the prompt
-it prints into Claude Code or Codex. The agent reads the git history since the
-skill was last updated, updates the agent skill, and sets its version. Review
-that diff. The `skill-version` pre-commit hook and the test suite reject a
-version bump without a skill refresh. Merge the changes to `main` through a pull
-request, then push a matching semantic version tag such as `v0.1.1`.
-
-The release workflow checks that the tag matches the package version, rebuilds
-and smoke-tests the wheel and source distribution, adds provenance attestations,
-and publishes through PyPI Trusted Publishing. Before the first release,
-configure a PyPI trusted publisher for this GitHub repository and the `pypi`
-GitHub Actions environment.
-
-</details>
+Run `just verify` before opening a pull request to run the same checks as CI.
+The [development guide](https://difegam.github.io/django-daisy-forms/development/)
+covers testing, browser checks, Git hooks, CI, documentation, the agent skill,
+and the release process.
 
 ## License
 

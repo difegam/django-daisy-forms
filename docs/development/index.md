@@ -11,22 +11,21 @@ just init
 just check
 ```
 
-`just init` installs every dependency group (test, lint, type checking, docs, and browser) and the pre-commit, pre-push, and commit-msg Git hooks. `just fresh` removes the virtual environment and caches first, then runs `init`.
+`just init` installs every dependency group (test, lint, type checking, docs, and browser) and sets up Git hooks. `just fresh` removes the virtual environment and caches first, then runs init.
 
 ## Available commands
 
-Run `just` with no arguments to list every recipe with its description, grouped
-by purpose:
+Run `just` with no arguments to list all recipes grouped by purpose:
 
-| Group     | Recipes                                                                    | Use it to                                                                 |
-| --------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `setup`   | `init`, `clean`, `fresh`, `update`                                         | Install or rebuild the environment and upgrade the lockfile               |
-| `dev`     | `format`, `format-check`, `lint`, `typecheck`, `test`, `check`, `build`    | Format, lint, type check, test, and build the distributions               |
-| `css`     | `css-check`, `css-preview`                                                 | Build the Tailwind and daisyUI fixture and check the package classes      |
-| `browser` | `browser-setup`, `browser-test`, `browser-preview`, `browser-cli`          | Run and inspect the opt-in browser checks                                 |
-| `docs`    | `doc-serve`, `doc-build`, `doc-llms`, `doc-format`, `doc-format-check`     | Preview, build, and format this site                                      |
-| `release` | `release-notes`, `bump-patch`, `bump-minor`, `bump-major`, `skill-refresh` | Prepare a release; see [Release process](contributing.md#release-process) |
-| `ci`      | `verify`                                                                   | Run every check that CI runs before opening a pull request                |
+| Group   | Recipes                                                          | Purpose                                   |
+| ------- | ---------------------------------------------------------------- | ----------------------------------------- |
+| setup   | init, clean, fresh, update                                       | Install or rebuild the environment        |
+| dev     | format, format-check, lint, typecheck, test, check, build        | Format, lint, type check, test, and build |
+| css     | css-check, css-preview                                           | Check package classes in compiled CSS     |
+| browser | browser-setup, browser-test, browser-preview, browser-cli        | Run browser validation checks             |
+| docs    | doc-serve, doc-build, doc-llms, doc-format, doc-format-check     | Preview, build, and format docs           |
+| release | release-notes, bump-patch, bump-minor, bump-major, skill-refresh | Prepare a release                         |
+| ci      | verify                                                           | Run all pre-PR checks                     |
 
 `just check` is the everyday entry point. `just update` upgrades the lockfile
 within the declared dependency constraints and syncs all development groups.
@@ -39,54 +38,26 @@ attribute so it shows up in the right place in `just`.
 just test
 ```
 
-This runs pytest with coverage. The project requires at least 94% coverage.
-
-For optional browser validation of the form layouts, use Node 20 or later:
+This runs pytest with coverage. The project requires at least 94% coverage. For optional browser validation of layouts, use Node 20 or later:
 
 ```bash
 just browser-setup
 just browser-test
 ```
 
-To inspect the live preview with the pinned Playwright CLI, run `just browser-preview` in one terminal and `just browser-cli` in another. The browser checks are opt-in and stay out of the default test and CI runs.
+To inspect the live preview, run `just browser-preview` and `just browser-cli` in separate terminals. Browser checks are opt-in and do not run by default in CI.
 
 ## Git hooks
 
-[prek](https://github.com/j178/prek) runs the hooks in `.pre-commit-config.yaml`:
-
-- **Before each commit:** whitespace, end-of-file, YAML, TOML, and JSON checks; Ruff format and lint; bandit; djlint on Django templates (the package templates and golden files are linted but never reformatted); codespell; shellcheck; and the test suite.
-- **On the commit message:** commitizen checks that it follows [Conventional Commits](https://www.conventionalcommits.org/).
-- **Before each push:** strict mypy, the coverage check, and a link check of the Markdown.
-- **On demand:** `just doc-format` (or `uv run prek run mdformat --hook-stage manual --all-files`) formats the docs Markdown.
+[prek](https://github.com/j178/prek) runs hooks from `.pre-commit-config.yaml`. Before each commit, it runs whitespace and YAML/TOML/JSON checks, Ruff, bandit, djlint on templates, codespell, shellcheck, and the test suite. The commit message hook enforces [Conventional Commits](https://www.conventionalcommits.org/). Before each push, it runs strict mypy, the coverage check, and Markdown link validation. Use `just doc-format` to format the docs.
 
 ## Continuous integration
 
-CI runs on every pull request and on `main`:
-
-- Ruff, strict mypy, and pytest across Python 3.12, 3.13, and 3.14 and Django 5.2, 6.0, and 6.1.
-- A build of the wheel and source distribution, with a smoke test of each in an isolated environment.
-- The Tailwind fixture against daisyUI 5.0.36 and 5.7.47, checking that every package class is in the compiled CSS.
-- A strict documentation build and a Markdown formatting check.
-
-Merges to `main` deploy this documentation site to GitHub Pages. Pushing a `v*` tag runs the release workflow; see [Contributing](contributing.md#release-process).
+CI runs on every pull request and on main. It runs Ruff, strict mypy, and pytest across Python 3.12, 3.13, and 3.14 with Django 5.2, 6.0, and 6.1. It builds and smoke-tests both wheel and source distributions, checks the Tailwind fixture against daisyUI 5.0.36 and 5.7.47, runs a strict docs build, and checks Markdown formatting. Merges to main deploy the documentation to GitHub Pages. Pushing a v\* tag runs the release workflow. See [Contributing](contributing.md#release-process).
 
 ## Agent skill
 
-The repository ships an agent skill in `skills/django-daisy-forms`, published
-through the `skills` CLI (see [AI integration](../ai-integration.md#agent-skill)).
-Its `metadata.version` must equal the package version:
-
-- `tests/test_skill.py` checks the version, the frontmatter, and the reference
-    links.
-- The `skill-version` pre-commit hook runs when `pyproject.toml` or the skill's
-    `SKILL.md` is staged, and rejects a commit whose versions differ.
-- `just skill-refresh` prints a prompt for Claude Code or Codex. The agent reads
-    the git history since the skill was last updated, updates the skill, and
-    sets its version with `scripts/sync-skill-version.sh`.
-
-When a change affects settings, the template tag, widgets, the management
-command, system checks, or error messages, update the skill in the same pull
-request.
+An agent skill lives in `skills/django-daisy-forms`, published through the skills CLI (see [AI integration](../ai-integration.md#agent-skill)). Its version must match the package version. `tests/test_skill.py` checks the version and frontmatter. The `skill-version` pre-commit hook rejects commits whose versions differ. Run `just skill-refresh` to generate a prompt for Claude Code, which updates the skill and syncs its version. When a change affects settings, the template tag, widgets, the management command, system checks, or error messages, update the skill in the same pull request.
 
 ## Documentation
 
@@ -99,4 +70,4 @@ just doc-build         # Strict build; fails on warnings
 just doc-llms          # Generate site/llms.txt (run after doc-build)
 ```
 
-The changelog page includes the repository's `CHANGELOG.md`, and the template reference includes the package templates directly, so neither needs to be copied by hand. `scripts/llms-txt.sh` builds `llms.txt` from the `nav` in `zensical.toml` and copies each page's Markdown next to it, so the file stays in sync with the docs and is published by the same workflow.
+The changelog includes `CHANGELOG.md` and the template reference includes package templates directly, so neither needs to be copied manually. `scripts/llms-txt.sh` builds `llms.txt` from `zensical.toml` and copies each page's Markdown next to it, keeping the file in sync.

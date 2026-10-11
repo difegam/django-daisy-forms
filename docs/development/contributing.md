@@ -4,38 +4,30 @@ Thank you for your interest in contributing to django-daisy-forms! This guide wi
 
 ## Getting started
 
-1. Fork the repository on GitHub
+Fork the repository on GitHub and clone your fork:
 
-2. Clone your fork locally:
+```bash
+git clone https://github.com/your-username/django-daisy-forms.git
+cd django-daisy-forms
+```
 
-    ```bash
-    git clone https://github.com/your-username/django-daisy-forms.git
-    cd django-daisy-forms
-    ```
+Set up the development environment:
 
-3. Set up the development environment:
+```bash
+just init
+```
 
-    ```bash
-    just init
-    ```
+Create a branch for your changes:
 
-4. Create a branch for your changes:
-
-    ```bash
-    git checkout -b my-feature
-    ```
+```bash
+git checkout -b my-feature
+```
 
 ## Making changes
 
 ### Code style
 
-The project uses:
-
-- **Ruff** for formatting and linting
-- **mypy** for type checking (strict mode with django-stubs)
-- **prek** for Git hooks (see [Git hooks](index.md#git-hooks))
-
-Run the checks before committing:
+The project uses Ruff for formatting and linting, mypy for type checking in strict mode with django-stubs, and prek for Git hooks (see [Git hooks](index.md#git-hooks)). Run checks before committing:
 
 ```bash
 just check
@@ -57,105 +49,48 @@ Common types are `feat`, `fix`, `docs`, `test`, `refactor`, `build`, `ci`, and `
 
 ### Adding features
 
-When adding a new feature:
-
-1. Write tests first (TDD approach)
-2. Ensure the feature works across all supported Django versions (5.2, 6.0, 6.1)
-3. Update documentation if needed
-4. Add an entry to `CHANGELOG.md` under the `Unreleased` section
+Write tests first (TDD approach). Ensure the feature works across all supported Django versions (5.2, 6.0, 6.1). Update documentation and add an entry to CHANGELOG.md under Unreleased.
 
 ### Bug fixes
 
-When fixing a bug:
-
-1. Write a test that reproduces the bug
-2. Fix the bug
-3. Ensure the test passes
-4. Run the full check suite
+Write a test that reproduces the bug, fix it, ensure the test passes, and run the full check suite.
 
 ### Documentation changes
 
-1. Edit the Markdown under `docs/` and preview it with `just doc-serve`
-2. Run `just doc-format` to format it
-3. Run `just doc-build` to build strictly; warnings fail the build
+Edit the Markdown under `docs/` and preview with `just doc-serve`. Format with `just doc-format` and build strictly with `just doc-build`; warnings fail the build.
 
 ### CSS changes
 
-If you change the classes used in templates:
-
-1. Add any new layout class to `LAYOUT_CLASSES` in `src/daisy_forms/classes.py`; `tests/test_classes.py` fails when a template class is missing from the registry
-2. Run `just css-check` to regenerate the `daisy_forms_css` output, build the Tailwind fixture, and check that every package class is in the compiled CSS
-3. Run `just browser-test` to check the layouts in Chromium
-4. Note in `CHANGELOG.md` that users must regenerate their `daisy_forms_css` file
+If you change template classes, add new layout classes to `LAYOUT_CLASSES` in `src/daisy_forms/classes.py`. Run `just css-check` to regenerate output and verify all classes are in compiled CSS. Run `just browser-test` to check layouts. Note in CHANGELOG.md that users must regenerate their CSS file.
 
 ## Submitting changes
 
-1. Push your branch to your fork:
+Push your branch to your fork:
 
-    ```bash
-    git push origin my-feature
-    ```
+```bash
+git push origin my-feature
+```
 
-2. Open a pull request against the `main` branch
-
-3. Describe your changes and link any related issues
-
-4. Run `just verify` locally to run the same checks as CI
-
-5. Wait for CI to pass; `main` requires every check and a squash merge
+Open a pull request against main, describing your changes and linking related issues. Run `just verify` locally to run the same checks as CI. Wait for CI to pass; main requires every check and a squash merge.
 
 ## Code review
 
-All pull requests are reviewed. The reviewer will check:
-
-- Code quality and style
-- Test coverage
-- Documentation updates
-- Backwards compatibility
+All pull requests are reviewed for code quality, style, test coverage, documentation updates, and backwards compatibility.
 
 ## Release process
 
-Releases are managed by the maintainers:
+Releases are managed by the maintainers. Run `just release-notes` to draft the release with Claude Code CLI. It sends commits, diffs, and CHANGELOG sections to generate suggested changes and write them to `.release/release.md`. Review the draft and add its entries to CHANGELOG.md under a `## [X.Y.Z] - YYYY-MM-DD` heading.
 
-1. Run `just release-notes` to draft the release with the
-    [Claude Code](https://docs.claude.com/en/docs/claude-code) CLI. It sends the
-    commits, diffs, and CHANGELOG sections since the latest tag to `claude -p`
-    with all tools disabled, and writes a suggested version bump, CHANGELOG
-    entries, and GitHub release notes to `.release/release.md`. Pass
-    `--dry-run` to write only the context and prompt, or `--from`/`--to` to
-    choose the range.
+Run `just bump-patch`, `just bump-minor`, or `just bump-major` to update the version and lockfile. Run `just skill-refresh` to update the agent skill. Open a pull request with version, changelog, and skill changes and merge it.
 
-2. Review the draft and add its entries to `CHANGELOG.md` under a
-    `## [X.Y.Z] - YYYY-MM-DD` heading, and update the link references at the
-    bottom.
+Tag the merge commit and push:
 
-3. Run `just bump-patch`, `just bump-minor`, or `just bump-major` to update the
-    package version and lockfile.
+```bash
+git tag -a vX.Y.Z -m "django-daisy-forms X.Y.Z"
+git push origin vX.Y.Z
+```
 
-4. Run `just skill-refresh` and paste the prompt it prints into Claude Code or
-    Codex. The agent reads the git history since the skill was last updated,
-    updates the agent skill, and sets its version. Review that diff. The
-    `skill-version` pre-commit hook and the test suite reject a version bump
-    without a skill refresh.
-
-5. Open a pull request with the version, changelog, and skill changes and merge
-    it.
-
-6. Tag the merge commit and push the tag:
-
-    ```bash
-    git tag -a vX.Y.Z -m "django-daisy-forms X.Y.Z"
-    git push origin vX.Y.Z
-    ```
-
-The release workflow checks that the tag matches the package version and that
-`CHANGELOG.md` has a section for it, runs the checks, builds and smoke-tests
-both distributions, publishes to PyPI through Trusted Publishing with
-provenance attestations, and creates a GitHub Release with the changelog
-section and the distribution files.
-
-Before the first release, configure a PyPI trusted publisher for this GitHub
-repository and the `pypi` GitHub Actions environment.
+The release workflow verifies the tag matches the package version, runs all checks, builds and smoke-tests distributions, publishes to PyPI through Trusted Publishing, and creates a GitHub Release. Before the first release, configure a PyPI trusted publisher for this repository.
 
 ## Reporting issues
 

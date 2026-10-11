@@ -29,6 +29,7 @@
   <a href="https://difegam.github.io/django-daisy-forms/"><strong>Documentation</strong></a> ·
   <a href="#quickstart">Quickstart</a> ·
   <a href="#why-django-daisy-forms">Why</a> ·
+  <a href="#agent-skill">Agent skill</a> ·
   <a href="#features">Features</a> ·
   <a href="#layouts-and-addons">Layouts</a> ·
   <a href="#support">Support</a> ·
@@ -71,9 +72,6 @@ Read the [full documentation](https://difegam.github.io/django-daisy-forms/) for
 per-field control, layouts, Tailwind CSS, and themes, plus the API reference
 and troubleshooting.
 
-Coding agents can install the [django-daisy-forms skill](https://difegam.github.io/django-daisy-forms/ai-integration/#agent-skill)
-with `npx skills add difegam/django-daisy-forms`.
-
 ## Why django-daisy-forms
 
 - **One setting.** `FORM_RENDERER` switches every `{{ form }}`, `{{ formset }}`
@@ -90,6 +88,32 @@ with `npx skills add difegam/django-daisy-forms`.
 - **CSS that can't drift.** A management command writes the Tailwind
   `@source inline()` file, and `--check` fails CI when it is out of date.
 - **Small footprint.** One runtime dependency, Django, and no JavaScript.
+
+## Agent skill
+
+Install the `django-daisy-forms` skill to teach Claude Code and Codex agents how
+to set up the package, write forms with `{% daisy_field %}`, wire Tailwind, add
+htmx validation, and review existing templates:
+
+```bash
+npx skills add difegam/django-daisy-forms --skill django-daisy-forms --agent claude-code --agent codex
+```
+
+Add `--global` to install it for your user account instead of this project:
+
+```bash
+npx skills add difegam/django-daisy-forms --skill django-daisy-forms --agent claude-code --agent codex --global
+```
+
+Agents load the skill when they work on Django forms. You can also call it with
+a mode and an optional path, such as `/django-daisy-forms setup` or
+`/django-daisy-forms review templates/`. The modes are `setup`, `form`,
+`tailwind`, `htmx`, and `review`. The skill's version matches the package
+release it documents; run `npx skills update django-daisy-forms` after upgrading
+the package. Installing the skill only adds agent instructions, so install the
+package itself as shown in the [Quickstart](#quickstart). See
+[AI integration](https://difegam.github.io/django-daisy-forms/ai-integration/#agent-skill)
+for details.
 
 ## Features
 

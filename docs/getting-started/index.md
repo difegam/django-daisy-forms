@@ -4,7 +4,7 @@ Get django-daisy-forms running in under five minutes. This section covers instal
 
 ## Prerequisites
 
-Before you begin, make sure your project meets these requirements:
+Your project must meet these requirements:
 
 | Requirement  | Version          |
 | ------------ | ---------------- |

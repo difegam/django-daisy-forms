@@ -1,6 +1,6 @@
 # Guide
 
-This guide walks through how django-daisy-forms works, from basic rendering to advanced customization.
+Learn how django-daisy-forms works, from basic rendering to advanced customization.
 
 <div class="grid cards" markdown>
 

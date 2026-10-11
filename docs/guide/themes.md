@@ -6,15 +6,7 @@ The package uses daisyUI component classes, so any daisyUI theme applies through
 
 ## Applying a theme
 
-Set `data-theme` on the `<html>` element or any container:
-
-```html
-<html data-theme="dark">
-  <!-- All forms use the dark theme -->
-</html>
-```
-
-Or on a specific form:
+Set `data-theme` on the `<html>` element or any container. All forms inside use that theme. To apply a theme to a specific form:
 
 ```html
 <form data-theme="cupcake">
@@ -102,7 +94,7 @@ To respect the user's system preference:
 
 ## No package configuration
 
-The package does not have a theme setting. Themes are pure CSS (`data-theme`), so there is nothing to configure in django-daisy-forms. Just use daisyUI's theme system.
+The package has no theme setting. Themes are pure CSS through `data-theme`, so use daisyUI's theme system directly.
 
 ## Custom themes
 

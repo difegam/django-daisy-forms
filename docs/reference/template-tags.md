@@ -16,61 +16,49 @@ django-daisy-forms provides one template tag: `{% daisy_field %}`. This page doc
 
 ## Options
 
-### `label`
-
-Overrides the label text:
+**label** — Overrides the label text:
 
 ```django
 {% daisy_field form.email label="Work email" %}
 ```
 
-### `label_class`
-
-Appends classes to the label or legend:
+**label_class** — Appends classes to the label or legend:
 
 ```django
 {% daisy_field form.email label_class="font-semibold text-primary" %}
 ```
 
-Affects the primary label for ordinary fields, the standalone label for checkbox/toggle fields, and the legend for grouped choices. Does **not** affect individual choice option labels.
+Affects the primary label for ordinary fields, the standalone label for checkbox/toggle fields, and the legend for grouped choices, but not individual choice option labels.
 
-### `template`
-
-Overrides the field template:
+**template** — Overrides the field template:
 
 ```django
 {% daisy_field form.email template="daisy_forms/field_horizontal.html" %}
 ```
 
-### `choices`
-
-Layout for radio/checkbox choices. Only accepts `inline`:
+**choices** — Layout for radio/checkbox choices. Only accepts `inline`:
 
 ```django
 {% daisy_field form.plan choices="inline" %}
 ```
 
-Only works with `RadioSelect` and `CheckboxSelectMultiple`. Raises `TemplateSyntaxError` for unsupported widgets or values.
+Works only with RadioSelect and CheckboxSelectMultiple. Raises TemplateSyntaxError for unsupported widgets or values.
 
-### `prefix`
-
-Text addon before the input:
+**prefix** — Text addon before the input:
 
 ```django
 {% daisy_field form.price prefix="$" %}
 ```
 
-Only works with stock, visible, single-line widgets rendered with daisyUI's `input` component. Raises `TemplateSyntaxError` for unsupported widgets.
+Works only with stock, visible, single-line widgets rendered with daisyUI's input component. Raises TemplateSyntaxError for unsupported widgets.
 
-### `suffix`
-
-Text addon after the input:
+**suffix** — Text addon after the input:
 
 ```django
 {% daisy_field form.price suffix="USD" %}
 ```
 
-Same restrictions as `prefix`.
+Same restrictions as prefix.
 
 Addon text is escaped. The addons copy the input's daisyUI size, color, and
 error modifiers (`input-xs` to `input-xl`, `input-primary` and the other color
@@ -91,8 +79,6 @@ Any other keyword argument becomes a widget attribute:
 {% daisy_field form.quantity min="1" max="100" %}
 ```
 
-### Class attributes
-
 Both `class=` and `class+=` append to daisyUI classes:
 
 ```django
@@ -100,11 +86,7 @@ Both `class=` and `class+=` append to daisyUI classes:
 {% daisy_field form.email class+="input-sm" %}
 ```
 
-The `+=` syntax is accepted for parity with django-widget-tweaks. `+=` is rejected on any other attribute name.
-
-### Hyphenated attributes
-
-Hyphenated attributes work without special syntax:
+The `+=` syntax is accepted for parity with django-widget-tweaks. It is rejected on any other attribute name. Hyphenated attributes work without special syntax:
 
 ```django
 {% daisy_field form.email hx-post="/validate/email/" %}
@@ -113,22 +95,7 @@ Hyphenated attributes work without special syntax:
 
 ## Disallowed attributes
 
-The tag rejects these attributes to prevent security issues and conflicts:
-
-### Inline event handlers
-
-- `on*` (e.g., `onclick`, `onchange`)
-- `hx-on*` (e.g., `hx-on-click`)
-- `x-on*` (e.g., `x-on-click`)
-- `x-init`
-- With optional `data-` prefix (e.g., `data-on-click`)
-
-### Managed attributes
-
-- `aria-invalid` — managed by the package based on validation state
-- `aria-describedby` — managed by the package to link help text and errors
-
-Attempting to use these raises a `TemplateSyntaxError` at template compile time:
+The tag rejects inline event handlers (`on*`, `hx-on*`, `x-on*`, `x-init` with optional `data-` prefix) and managed attributes (`aria-invalid`, `aria-describedby`) to prevent security issues and conflicts. Attempting to use these raises a TemplateSyntaxError at template compile time:
 
 ```django
 {% daisy_field form.email onclick="alert('hi')" %}
@@ -140,32 +107,19 @@ TemplateSyntaxError: Attribute is not allowed: onclick
 
 ## Error handling
 
-### Invalid field names
-
-Passing a non-bound-field argument raises a `ValueError` at render time:
+Invalid field names raise ValueError at render time:
 
 ```django
 {% daisy_field form.nonexistent %}
 ```
 
-```text
+```
 ValueError: {% daisy_field %} expected a bound field, got ''.
 ```
 
-### Opted-out fields
+A field whose `bound_field_class` is a plain BoundField opts out of the package. Passing it to the tag raises TemplateSyntaxError.
 
-A field whose `bound_field_class` is a plain `BoundField` opts out of the
-package. Passing it to the tag raises:
-
-```text
-TemplateSyntaxError: {% daisy_field %} cannot be used on a field that opts out of DaisyBoundField (a plain BoundField opts out); render it with {{ field }} instead.
-```
-
-### Invalid options
-
-Unsupported option values raise `TemplateSyntaxError`:
-
-These are raised when the field renders:
+Unsupported option values raise TemplateSyntaxError when the field renders:
 
 | Usage                                                                                        | Error                                                                               |
 | -------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |

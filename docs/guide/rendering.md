@@ -88,10 +88,7 @@ help text and errors.
 
 ## Form markup
 
-`DaisyFormRenderer` renders forms with `daisy_forms/form.html`. It receives
-Django's form rendering context: `errors` (non-field errors, including errors
-from hidden fields), `fields` (pairs of visible bound field and its errors), and
-`hidden_fields`.
+`DaisyFormRenderer` renders forms with `daisy_forms/form.html`, receiving Django's form rendering context: `errors` (non-field errors), `fields` (pairs of visible bound field and errors), and `hidden_fields`.
 
 ```django
 --8<-- "src/daisy_forms/templates/daisy_forms/form.html"
@@ -99,7 +96,7 @@ from hidden fields), `fields` (pairs of visible bound field and its errors), and
 
 ## Formset markup
 
-Formsets render the management form, then non-form errors, then each form:
+Formsets render the management form, non-form errors, then each form:
 
 ```django
 --8<-- "src/daisy_forms/templates/daisy_forms/formset.html"
@@ -107,9 +104,4 @@ Formsets render the management form, then non-form errors, then each form:
 
 ## Custom widgets
 
-Custom widgets that are not in the registry render inside the field wrapper but without daisyUI classes. To style a custom widget, either:
-
-1. Subclass a registered widget (e.g., `class MyInput(TextInput)`)
-2. Pass classes through widget `attrs`: `widget=MyWidget(attrs={"class": "input"})`
-
-Third-party widgets with custom templates are left untouched by design.
+Custom widgets not in the registry render inside the field wrapper without daisyUI classes. To style a custom widget, subclass a registered widget (e.g., `class MyInput(TextInput)`) or pass classes through widget `attrs`. Third-party widgets with custom templates are left unchanged.

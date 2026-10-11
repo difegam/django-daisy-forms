@@ -1,6 +1,5 @@
 ---
-hide:
-  - toc
+title: daisyUI 5 forms for Django
 ---
 
 # daisyUI 5 forms for Django
@@ -89,14 +88,14 @@ Render `{{ form }}` as usual — every field now renders with daisyUI markup.
 
 ## Features
 
-| Feature                         | Description                                                                                                                                         |
-| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **One setting**                 | `FORM_RENDERER` switches every `{{ form }}`, `{{ formset }}` and `{{ form.field.as_field_group }}` to daisyUI markup. No FormHelper, no layout DSL. |
-| **Built on Django's APIs**      | A class registry gives each widget its daisyUI component through a custom `BoundField`. Django's global widget templates are never overridden.      |
-| **Server-authoritative errors** | Errors use `aria-invalid` and `aria-describedby` ids that Django already generates. No client-side validation.                                      |
-| **Per-field control**           | `{% daisy_field %}` merges classes, passes `hx-*` attributes, and opts fields into horizontal layouts, inline choices, or text addons.              |
-| **CSS that can't drift**        | A management command writes the Tailwind `@source inline()` file, and `--check` fails CI when it is out of date.                                    |
-| **Small footprint**             | One runtime dependency (Django), no JavaScript.                                                                                                     |
+| Feature                     | Description                                                                                                                                         |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| One setting                 | `FORM_RENDERER` switches every `{{ form }}`, `{{ formset }}` and `{{ form.field.as_field_group }}` to daisyUI markup. No FormHelper, no layout DSL. |
+| Built on Django's APIs      | A class registry gives each widget its daisyUI component through a custom `BoundField`. Django's global widget templates are never overridden.      |
+| Server-authoritative errors | Errors use `aria-invalid` and `aria-describedby` ids that Django already generates. No client-side validation.                                      |
+| Per-field control           | `{% daisy_field %}` merges classes, passes `hx-*` attributes, and opts fields into horizontal layouts, inline choices, or text addons.              |
+| CSS that can't drift        | A management command writes the Tailwind `@source inline()` file, and `--check` fails CI when it is out of date.                                    |
+| Small footprint             | One runtime dependency (Django), no JavaScript.                                                                                                     |
 
 ## Support
 

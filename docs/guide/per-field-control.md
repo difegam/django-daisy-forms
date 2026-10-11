@@ -78,14 +78,14 @@ See [Layouts & addons](layouts-addons.md) for details on the horizontal template
 
 The following names are reserved and do not become widget attributes:
 
-| Option        | Purpose                                      |
-| ------------- | -------------------------------------------- |
-| `label`       | Overrides label text                         |
-| `label_class` | Appends classes to the label or legend       |
-| `template`    | Overrides the field template                 |
-| `choices`     | Layout for radio/checkbox choices (`inline`) |
-| `prefix`      | Text addon before the input                  |
-| `suffix`      | Text addon after the input                   |
+| Option        | Purpose                                    |
+| ------------- | ------------------------------------------ |
+| `label`       | Overrides label text                       |
+| `label_class` | Appends classes to the label or legend     |
+| `template`    | Overrides the field template               |
+| `choices`     | Layout for radio/checkbox choices (inline) |
+| `prefix`      | Text addon before the input                |
+| `suffix`      | Text addon after the input                 |
 
 To set the HTML `prefix` attribute (RDFa), use widget `attrs` instead:
 
@@ -97,12 +97,7 @@ email = forms.EmailField(
 
 ## Disallowed attributes
 
-The tag rejects these attributes to prevent security issues and conflicts:
-
-- Inline event handlers: `on*`, `hx-on*`, `x-on*`, `x-init` (with optional `data-` prefix)
-- Managed attributes: `aria-invalid`, `aria-describedby`
-
-Attempting to use these raises a `TemplateSyntaxError` when the template is compiled:
+The tag rejects inline event handlers (`on*`, `hx-on*`, `x-on*`, `x-init` with optional `data-` prefix) and managed attributes (`aria-invalid`, `aria-describedby`) to prevent security issues and conflicts. Attempting to use these raises a `TemplateSyntaxError` when the template compiles:
 
 ```django
 {% daisy_field form.email onclick="alert('hi')" %}
@@ -136,7 +131,7 @@ The tag renders a copy of the bound field with overrides. It never mutates the f
 
 ## Opting out of the tag
 
-To opt a field out of the daisy rendering entirely, set `bound_field_class` on the field:
+Set `bound_field_class` on a field to opt out of daisy rendering:
 
 ```python
 from django import forms
@@ -148,8 +143,4 @@ class MyForm(forms.Form):
     email.bound_field_class = BoundField  # Opt out
 ```
 
-An opted-out field cannot be passed to `{% daisy_field %}`. Render it with `{{ field }}` instead. Passing it to the tag raises:
-
-```text
-TemplateSyntaxError: {% daisy_field %} cannot be used on a field that opts out of DaisyBoundField (a plain BoundField opts out); render it with {{ field }} instead.
-```
+Render opted-out fields with `{{ field }}` instead of `{% daisy_field %}`. Passing an opted-out field to the tag raises a `TemplateSyntaxError`.

@@ -58,9 +58,9 @@ Addons are wrapped in a `join` container:
 
 ```html
 <div class="join w-full">
-  <span class="input input-bordered join-item w-auto">$</span>
-  <input type="number" name="price" class="input input-bordered join-item flex-1" id="id_price">
-  <span class="input input-bordered join-item w-auto">USD</span>
+  <span class="input join-item w-auto">$</span>
+  <input type="number" name="price" step="any" required class="input join-item flex-1" id="id_price">
+  <span class="input join-item w-auto">USD</span>
 </div>
 ```
 

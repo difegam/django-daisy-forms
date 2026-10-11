@@ -4,13 +4,13 @@ django-daisy-forms exists to fill a gap: no maintained package renders daisyUI 5
 
 ## The problem
 
-Django's built-in form rendering is clean but unstyled. To get styled forms, most projects reach for django-crispy-forms with a template pack. This works, but introduces:
+Django's built-in form rendering is clean but unstyled. To get styled forms, most projects reach for django-crispy-forms with a template pack. This approach brings:
 
 - A separate rendering pipeline that bypasses Django's `BoundField` APIs
 - A layout DSL (FormHelper, Layout objects) that duplicates Django's template language
 - An additional dependency with its own release cycle
 
-For daisyUI specifically, existing options are limited:
+Existing daisyUI options are limited:
 
 | Package          | Status                      | Approach                                 |
 | ---------------- | --------------------------- | ---------------------------------------- |
@@ -20,31 +20,19 @@ For daisyUI specifically, existing options are limited:
 
 ## The approach
 
-django-daisy-forms takes a different path:
+django-daisy-forms takes a different path.
 
-### One setting
+**One setting.** `FORM_RENDERER` switches every `{{ form }}`, `{{ formset }}` and `{{ form.field.as_field_group }}` to daisyUI markup. No FormHelper, no layout DSL.
 
-`FORM_RENDERER` switches every `{{ form }}`, `{{ formset }}` and `{{ form.field.as_field_group }}` to daisyUI markup. No FormHelper, no layout DSL.
+**Built on Django's APIs.** A class registry gives each widget its daisyUI component through a custom `BoundField`. Django's global widget templates are never overridden, and custom widgets are left alone.
 
-### Built on Django's APIs
+**Server-authoritative errors.** Errors come from Django validation and use the same `aria-invalid` and `aria-describedby` ids Django already generates. All validation stays on the server.
 
-A class registry gives each widget its daisyUI component through a custom `BoundField`. Django's global widget templates are never overridden, and custom widgets are left alone.
+**Per-field control when you need it.** `{% daisy_field %}` merges classes, passes attributes such as `hx-*`, and opts fields into horizontal layouts, inline choices, or text addons. It refuses inline event handlers.
 
-### Server-authoritative errors
+**CSS that can't drift.** A management command writes the Tailwind `@source inline()` file, and `--check` fails CI when it is out of date. Your Tailwind build always knows about every daisyUI class the package emits.
 
-Errors come from Django validation and use the same `aria-invalid` and `aria-describedby` ids Django already generates. The server has the final say — no client-side validation framework to configure or fight with.
-
-### Per-field control when you need it
-
-`{% daisy_field %}` merges classes, passes attributes such as `hx-*`, and opts fields into horizontal layouts, inline choices, or text addons. It refuses inline event handlers.
-
-### CSS that can't drift
-
-A management command writes the Tailwind `@source inline()` file, and `--check` fails CI when it is out of date. Your Tailwind build always knows about every daisyUI class the package emits.
-
-### Small footprint
-
-One runtime dependency (Django), no JavaScript, no Alpine, no build step beyond what your project already has.
+**Small footprint.** One runtime dependency (Django), no JavaScript, no Alpine, no build step beyond what your project already has.
 
 ## Design principles
 
@@ -60,9 +48,4 @@ One runtime dependency (Django), no JavaScript, no Alpine, no build step beyond 
 
 ## When to use something else
 
-django-daisy-forms is not for everyone. Consider alternatives if you need:
-
-- **A general-purpose layout DSL** — django-crispy-forms has this, django-daisy-forms does not
-- **Bootstrap or plain Tailwind** — this package is daisyUI-specific
-- **Client-side validation** — use htmx with Django validation, or a different tool
-- **Django < 5.2** — the package requires Django 5.2+ for `bound_field_class` at the renderer level
+Consider alternatives if you need a general-purpose layout DSL (django-crispy-forms provides one), Bootstrap or plain Tailwind support, client-side validation frameworks, or Django versions older than 5.2.

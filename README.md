@@ -71,6 +71,9 @@ Read the [full documentation](https://difegam.github.io/django-daisy-forms/) for
 per-field control, layouts, Tailwind CSS, and themes, plus the API reference
 and troubleshooting.
 
+Coding agents can install the [django-daisy-forms skill](https://difegam.github.io/django-daisy-forms/ai-integration/#agent-skill)
+with `npx skills add difegam/django-daisy-forms`.
+
 ## Why django-daisy-forms
 
 - **One setting.** `FORM_RENDERER` switches every `{{ form }}`, `{{ formset }}`
@@ -322,7 +325,11 @@ the range.
 Review the draft, add its entries to CHANGELOG.md under a
 `## [X.Y.Z] - YYYY-MM-DD` heading, and update the link references. Then run
 `just bump-patch`, `just bump-minor`, or `just bump-major` to update the
-package version and lockfile. Merge the changes to `main` through a pull
+package version and lockfile. Then run `just skill-refresh` and paste the prompt
+it prints into Claude Code or Codex. The agent reads the git history since the
+skill was last updated, updates the agent skill, and sets its version. Review
+that diff. The `skill-version` pre-commit hook and the test suite reject a
+version bump without a skill refresh. Merge the changes to `main` through a pull
 request, then push a matching semantic version tag such as `v0.1.1`.
 
 The release workflow checks that the tag matches the package version, rebuilds

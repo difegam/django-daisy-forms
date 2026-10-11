@@ -96,13 +96,17 @@ to set up the package, write forms with `{% daisy_field %}`, wire Tailwind, add
 htmx validation, and review existing templates:
 
 ```bash
-npx skills add difegam/django-daisy-forms --skill django-daisy-forms --agent claude-code --agent codex
+npx skills add difegam/django-daisy-forms --skill django-daisy-forms \
+    --agent claude-code \
+    --agent codex
 ```
 
 Add `--global` to install it for your user account instead of this project:
 
 ```bash
-npx skills add difegam/django-daisy-forms --skill django-daisy-forms --agent claude-code --agent codex --global
+npx skills add difegam/django-daisy-forms --skill django-daisy-forms \
+    --agent claude-code \
+    --agent codex --global
 ```
 
 Agents load the skill when they work on Django forms. You can also call it with

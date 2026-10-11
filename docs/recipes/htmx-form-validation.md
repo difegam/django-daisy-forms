@@ -1,14 +1,10 @@
 # Whole-form validation with HTMX 2
 
-This recipe keeps validation in Django. A regular POST renders the full page
-with bound-field errors. An HTMX POST replaces the form with the same
-server-rendered form fragment when invalid, using status `422`, or with a
-success fragment when valid. The package does not install or configure HTMX.
+Keep validation in Django. A regular POST renders the full page with bound-field errors. An HTMX POST replaces the form with the server-rendered form fragment when invalid (status `422`) or with a success fragment when valid. The package does not install or configure HTMX.
 
 ## View
 
-The example assumes a `ContactForm`, a `contact` URL, and that successful
-submissions are handled by the application at the marked point.
+The example assumes a ContactForm and contact URL, with successful submissions handled at the marked point.
 
 ```python
 from django.shortcuts import render
@@ -52,8 +48,7 @@ submissions if that better fits their flow.
 
 ## Templates
 
-The page template includes the same form fragment used for the invalid HTMX
-response:
+The page template includes the form fragment used for both normal and HTMX responses:
 
 ```django
 {# contact/page.html #}
@@ -64,9 +59,7 @@ response:
 {% endblock %}
 ```
 
-The fragment keeps a stable id so `outerHTML` can replace it with another form
-fragment or the success fragment. The HTMX configuration preserves the other
-HTMX 2 response defaults while making `422` responses swappable:
+The fragment keeps a stable id so outerHTML can replace it. Configure HTMX to swap `422` responses:
 
 ```html
 <meta name="htmx-config" content='{"responseHandling":[
@@ -99,9 +92,4 @@ HTMX 2 response defaults while making `422` responses swappable:
 </div>
 ```
 
-Django renders the invalid form's help text, field errors,
-`aria-invalid` and `aria-describedby` in the usual way. The browser only swaps
-that HTML; no client-side validation code or package middleware is needed.
-
-See the [HTMX 2 response-handling documentation](https://htmx.org/docs/#response-handling)
-for the status handling configuration described here.
+Django renders help text, field errors, aria-invalid and aria-describedby normally. The browser swaps the HTML; no client-side validation code or middleware is needed. See the [HTMX 2 response-handling documentation](https://htmx.org/docs/#response-handling) for more on status handling.

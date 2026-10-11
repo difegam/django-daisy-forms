@@ -2,13 +2,9 @@
 
 django-daisy-forms provides two system checks to verify your configuration. Run them with `python manage.py check`.
 
-## `daisy_forms.E001`
+## daisy_forms.E001
 
-**Severity:** Error
-
-**Meaning:** `django.forms` is missing from `INSTALLED_APPS`.
-
-**Fix:** Add `django.forms` to `INSTALLED_APPS`:
+Error: `django.forms` is missing from `INSTALLED_APPS`. The package uses `TemplatesSetting` as the renderer base class, which requires `django.forms` to be installed. Add it:
 
 ```python
 INSTALLED_APPS = [
@@ -18,27 +14,15 @@ INSTALLED_APPS = [
 ]
 ```
 
-**Why it matters:** The package uses `TemplatesSetting` as the renderer base class. Django requires `django.forms` to be in `INSTALLED_APPS` for `TemplatesSetting` to work.
+## daisy_forms.W001
 
-## `daisy_forms.W001`
-
-**Severity:** Warning
-
-**Meaning:** `FORM_RENDERER` is not set to `DaisyFormRenderer` or a subclass of it. It is also raised when the `FORM_RENDERER` path cannot be imported, with the import error in the message.
-
-**Fix:** Set `FORM_RENDERER` in your settings:
+Warning: `FORM_RENDERER` is not set to `DaisyFormRenderer` or a subclass. It is also raised when the path cannot be imported. Set it in your settings:
 
 ```python
 FORM_RENDERER = "daisy_forms.renderers.DaisyFormRenderer"
 ```
 
-**Why it matters:** If `FORM_RENDERER` is not set to the daisy renderer, forms will not render with daisyUI markup.
-
-**When to ignore:** You can ignore this warning if you are:
-
-- Using a custom renderer that subclasses `DaisyFormRenderer`
-- Testing the package without the renderer
-- Intentionally using a different renderer for specific forms
+Without this setting, forms will not render with daisyUI markup. Ignore this warning if you are using a custom renderer that subclasses DaisyFormRenderer, testing the package without the renderer, or using a different renderer for specific forms.
 
 ## Running checks
 

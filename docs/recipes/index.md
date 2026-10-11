@@ -1,6 +1,6 @@
 # Recipes
 
-Practical examples showing how to use django-daisy-forms in common scenarios.
+Practical examples for common scenarios.
 
 <div class="grid cards" markdown>
 

@@ -4,30 +4,21 @@ django-daisy-forms maps Django widgets to daisyUI components through a class reg
 
 ## Widget class mapping
 
-The class registry maps Django widget types to daisyUI component classes. The lookup uses the widget's MRO (method resolution order), so subclasses of registered widgets inherit the class.
+The class registry maps Django widget types to daisyUI component classes using the widget's MRO (method resolution order), so subclasses of registered widgets inherit the class.
 
-| Django widget            | daisyUI class | Notes                        |
-| ------------------------ | ------------- | ---------------------------- |
-| `HiddenInput`            | *None*        | No class applied             |
-| `TextInput`              | `input`       | Via the `Input` base class   |
-| `EmailInput`             | `input`       | Via the `Input` base class   |
-| `URLInput`               | `input`       | Via the `Input` base class   |
-| `NumberInput`            | `input`       | Via the `Input` base class   |
-| `PasswordInput`          | `input`       | Via the `Input` base class   |
-| `DateInput`              | `input`       | Registered directly          |
-| `DateTimeInput`          | `input`       | Registered directly          |
-| `TimeInput`              | `input`       | Registered directly          |
-| `Textarea`               | `textarea`    |                              |
-| `Select`                 | `select`      | Includes `NullBooleanSelect` |
-| `CheckboxInput`          | `checkbox`    |                              |
-| `RadioSelect`            | `radio`       |                              |
-| `CheckboxSelectMultiple` | `checkbox`    |                              |
-| `FileInput`              | `file-input`  |                              |
-| `ClearableFileInput`     | `file-input`  | Custom package template      |
-| `Toggle`                 | `toggle`      | Package widget               |
-| `NativeDateInput`        | `input`       | Package widget               |
-| `NativeTimeInput`        | `input`       | Package widget               |
-| `NativeDateTimeInput`    | `input`       | Package widget               |
+| Widget                                                      | Class      | Notes                                   |
+| ----------------------------------------------------------- | ---------- | --------------------------------------- |
+| HiddenInput                                                 | None       | No class applied                        |
+| TextInput, EmailInput, URLInput, NumberInput, PasswordInput | input      | Via Input base class                    |
+| DateInput, DateTimeInput, TimeInput                         | input      | Registered directly                     |
+| Textarea                                                    | textarea   |                                         |
+| Select                                                      | select     | Includes NullBooleanSelect              |
+| CheckboxInput                                               | checkbox   |                                         |
+| RadioSelect                                                 | radio      |                                         |
+| CheckboxSelectMultiple                                      | checkbox   |                                         |
+| FileInput, ClearableFileInput                               | file-input | ClearableFileInput uses custom template |
+| Toggle                                                      | toggle     | Package widget                          |
+| NativeDateInput, NativeTimeInput, NativeDateTimeInput       | input      | Package widgets                         |
 
 ## Input types
 
@@ -42,16 +33,7 @@ widget's own `input_type`) is checked before the widget class:
 
 ## Error variants
 
-When a field has validation errors, the package appends `-error` to the base class:
-
-- `input` → `input-error`
-- `textarea` → `textarea-error`
-- `select` → `select-error`
-- `checkbox` → `checkbox-error`
-- `radio` → `radio-error`
-- `toggle` → `toggle-error`
-- `file-input` → `file-input-error`
-- `range` → `range-error`
+When a field has validation errors, the package appends `-error` to the base class. Each component class has a corresponding `-error` variant: input-error, textarea-error, select-error, checkbox-error, radio-error, toggle-error, file-input-error, range-error.
 
 ## Custom widgets
 
@@ -129,40 +111,11 @@ This means:
 
 ## Unregistered widgets
 
-Widgets not in the registry (e.g., `MultiWidget`, `SplitDateTimeWidget`, custom widgets) render inside the field wrapper but without daisyUI classes.
-
-To style an unregistered widget:
-
-1. **Subclass a registered widget** — if your widget is a variant of a registered type:
-
-    ```python
-    class MyInput(TextInput):
-        # Inherits "input" class
-        pass
-    ```
-
-2. **Pass classes through attrs** — for completely custom widgets:
-
-    ```python
-    widget=MyWidget(attrs={"class": "input"})
-    ```
-
-3. **Override the widget template** — if you need full control:
-
-    ```python
-    class MyWidget(forms.Widget):
-        template_name = "my_app/my_widget.html"
-    ```
+Widgets not in the registry (`MultiWidget`, `SplitDateTimeWidget`, custom widgets) render inside the field wrapper but without daisyUI classes. You can style an unregistered widget by subclassing a registered widget (if it's a variant), passing classes through the widget's `attrs`, or overriding the widget template.
 
 ## Template swapping
 
-For widgets that use Django's stock templates (radio, checkbox group, clearable file), the package swaps in its own templates on a **copy** of the widget:
-
-- `RadioSelect` → `daisy_forms/widgets/radio.html`
-- `CheckboxSelectMultiple` → `daisy_forms/widgets/checkbox_select.html`
-- `ClearableFileInput` → `daisy_forms/widgets/clearable_file_input.html`
-
-Third-party widgets with custom templates are left untouched.
+For widgets that use Django's stock templates (radio, checkbox group, clearable file), the package swaps in its own templates on a copy of the widget. RadioSelect uses `daisy_forms/widgets/radio.html`, CheckboxSelectMultiple uses `daisy_forms/widgets/checkbox_select.html`, and ClearableFileInput uses `daisy_forms/widgets/clearable_file_input.html`. Third-party widgets with custom templates are left unchanged.
 
 ## Registry source
 

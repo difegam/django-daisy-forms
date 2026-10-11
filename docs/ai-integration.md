@@ -1,6 +1,6 @@
 # AI Integration
 
-These docs are readable by AI assistants: a machine-friendly index at `/llms.txt` and a plain Markdown copy of every page.
+The docs are machine-readable for AI assistants: a machine-friendly index at `/llms.txt` and a plain Markdown copy of every page.
 
 ## llms.txt
 

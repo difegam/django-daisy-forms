@@ -1,6 +1,6 @@
 # Reference
 
-Complete API reference for django-daisy-forms.
+API reference for django-daisy-forms.
 
 <div class="grid cards" markdown>
 

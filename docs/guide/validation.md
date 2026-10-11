@@ -126,7 +126,7 @@ See the [HTMX form validation recipe](../recipes/htmx-form-validation.md) for a 
 
 ## Non-field errors
 
-Non-field errors (errors not associated with a specific field) render in an alert at the top of the form:
+Non-field errors render in an alert at the top of the form:
 
 ```html
 <div role="alert" class="alert alert-error alert-soft">

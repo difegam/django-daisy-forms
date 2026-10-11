@@ -102,11 +102,13 @@ The `inline()` approach is explicit, committed, and works everywhere.
 
 ## Verifying the build
 
-After generating the file and building your CSS, verify that the compiled CSS includes the package classes:
+After generating the file and building your CSS, verify that the compiled CSS includes the package classes. `input-error` is a good probe: the package emits it for invalid fields, and projects rarely write it themselves:
 
 ```bash
-grep "input-bordered" static/css/main.css
+grep -c "\.input-error" static/css/main.css
 ```
+
+A count of zero means the generated file is not part of the build.
 
 If the classes are missing, check that:
 

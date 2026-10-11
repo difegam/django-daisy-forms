@@ -69,7 +69,7 @@ Or through the template tag:
 
 ## htmx integration
 
-With htmx, return a `422` status with the re-rendered field group when validation fails. htmx 2 swaps `4xx` responses by default, so the error markup replaces the form fragment.
+With htmx, return a `422` status with the re-rendered field group when validation fails. htmx 2 does not swap `4xx` responses by default, so enable swapping for `422` with the configuration below; the error markup then replaces the form fragment.
 
 ```python
 from django.shortcuts import render

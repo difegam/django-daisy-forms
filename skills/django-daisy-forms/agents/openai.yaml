@@ -1,0 +1,3 @@
+interface:
+  display_name: "django-daisy-forms"
+  short_description: "Set up and use daisyUI 5 forms in Django"

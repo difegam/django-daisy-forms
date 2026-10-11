@@ -115,6 +115,14 @@ repos:
         pass_filenames: false
         stages: [pre-commit, manual]
 
+      - id: skill-version
+        name: check agent skill matches package version
+        entry: scripts/skill-refresh-prompt.sh
+        language: system
+        pass_filenames: false
+        files: ^(pyproject\.toml|skills/django-daisy-forms/SKILL\.md)$
+        stages: [pre-commit, manual]
+
       - id: pytest-coverage
         name: check test coverage
         entry: uv run pytest --cov

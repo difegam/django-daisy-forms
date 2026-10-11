@@ -63,17 +63,24 @@ update:
 release-notes *args:
     scripts/release-notes.sh {{ args }}
 
+[doc("Print an agent prompt to update the skill after a version bump")]
+skill-refresh:
+    scripts/skill-refresh-prompt.sh
+
 [doc("Bump the package patch version with uv")]
 bump-patch:
     uv version --bump patch
+    @echo "The agent skill is now behind the package. Run: just skill-refresh"
 
 [doc("Bump the package minor version with uv")]
 bump-minor:
     uv version --bump minor
+    @echo "The agent skill is now behind the package. Run: just skill-refresh"
 
 [doc("Bump the package major version with uv")]
 bump-major:
     uv version --bump major
+    @echo "The agent skill is now behind the package. Run: just skill-refresh"
 
 [doc("Run every local check that CI runs")]
 [group("ci")]

@@ -45,3 +45,34 @@ For django-daisy-forms, read https://difegam.github.io/django-daisy-forms/llms.t
 ```
 
 To give an assistant one page only, such as the [template tag reference](reference/template-tags.md), paste or fetch that page's `.md` URL.
+
+## Agent skill
+
+The repository ships an [Agent Skill](https://agentskills.io/) that teaches coding
+agents to set up and use the package. It works with Claude Code, Codex, and other
+agents that the [`skills` CLI](https://github.com/vercel-labs/skills) supports:
+
+```bash
+npx skills add difegam/django-daisy-forms
+```
+
+Add `-a claude-code` or `-a codex` to pick an agent, and `-g` to install it for every
+project. The agent loads the skill when it works on Django forms. You can also call it
+with a mode and an optional path:
+
+| Command                               | What it does                                                   |
+| ------------------------------------- | -------------------------------------------------------------- |
+| `/django-daisy-forms setup`           | Installs and configures the package, then wires Tailwind       |
+| `/django-daisy-forms form <template>` | Writes or edits forms and templates with `{% daisy_field %}`   |
+| `/django-daisy-forms tailwind`        | Generates the CSS source file and adds the CI check            |
+| `/django-daisy-forms htmx <view>`     | Adds server-side validation with htmx, per field or whole form |
+| `/django-daisy-forms review <path>`   | Audits templates, forms, and settings for common mistakes      |
+
+The skill lives in `skills/django-daisy-forms` in the [repository](https://github.com/difegam/django-daisy-forms).
+The skill's version always matches the package release it documents. It is set in
+`metadata.version` and in the skill text. On every release, the maintainers update the skill
+from the git history since its previous version, and a pre-commit hook blocks a
+version bump that skips this step. Before writing code, the agent compares it
+with the installed package. If the package is newer, the agent reads the changelog and
+`llms.txt` and suggests `npx skills update django-daisy-forms`. If the package is
+older, the agent checks the changelog before it uses newer features.

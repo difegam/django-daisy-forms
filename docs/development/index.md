@@ -15,36 +15,23 @@ just check
 
 ## Available commands
 
-```text
-just format     Format Python files with Ruff.
-just lint       Run Ruff linting.
-just typecheck  Run strict mypy with django-stubs.
-just test       Run pytest with coverage.
-just check      Run formatting, linting, type checks, and tests.
-just css-check  Build the Tailwind and daisyUI fixture.
-just css-preview  Build the fixture CSS for the browser preview.
-just build      Build wheel and source-distribution artifacts.
-just verify     Run every check CI runs: check, css-check, build, and docs.
+Run `just` with no arguments to list every recipe with its description, grouped
+by purpose:
 
-just init       Install all dependency groups and the Git hooks.
-just clean      Remove the virtualenv, caches, and build output.
-just fresh      Run clean, then init.
-just update     Upgrade the lockfile within declared constraints.
+| Group     | Recipes                                                                    | Use it to                                                                 |
+| --------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `setup`   | `init`, `clean`, `fresh`, `update`                                         | Install or rebuild the environment and upgrade the lockfile               |
+| `dev`     | `format`, `format-check`, `lint`, `typecheck`, `test`, `check`, `build`    | Format, lint, type check, test, and build the distributions               |
+| `css`     | `css-check`, `css-preview`                                                 | Build the Tailwind and daisyUI fixture and check the package classes      |
+| `browser` | `browser-setup`, `browser-test`, `browser-preview`, `browser-cli`          | Run and inspect the opt-in browser checks                                 |
+| `docs`    | `doc-serve`, `doc-build`, `doc-llms`, `doc-format`, `doc-format-check`     | Preview, build, and format this site                                      |
+| `release` | `release-notes`, `bump-patch`, `bump-minor`, `bump-major`, `skill-refresh` | Prepare a release; see [Release process](contributing.md#release-process) |
+| `ci`      | `verify`                                                                   | Run every check that CI runs before opening a pull request                |
 
-just doc-serve         Preview the documentation site locally.
-just doc-build         Build the documentation, failing on warnings.
-just doc-llms          Generate llms.txt and page markdown into site/ (after doc-build).
-just doc-format        Format the docs Markdown with mdformat.
-just doc-format-check  Check the docs Markdown formatting.
-
-just browser-setup    Install Playwright, Chromium, and the browser CLI.
-just browser-test     Run the opt-in browser checks for form layouts.
-just browser-preview  Serve the layout preview at 127.0.0.1:8000/__preview__/.
-just browser-cli      Open the preview in the pinned Playwright CLI.
-
-just release-notes  Draft the next release's changelog and notes with Claude.
-just bump-patch     Bump the package version (also bump-minor, bump-major).
-```
+`just check` is the everyday entry point. `just update` upgrades the lockfile
+within the declared dependency constraints and syncs all development groups.
+Give every new recipe a `[doc("...")]` description and a `[group("...")]`
+attribute so it shows up in the right place in `just`.
 
 ## Testing
 
@@ -82,6 +69,24 @@ CI runs on every pull request and on `main`:
 - A strict documentation build and a Markdown formatting check.
 
 Merges to `main` deploy this documentation site to GitHub Pages. Pushing a `v*` tag runs the release workflow; see [Contributing](contributing.md#release-process).
+
+## Agent skill
+
+The repository ships an agent skill in `skills/django-daisy-forms`, published
+through the `skills` CLI (see [AI integration](../ai-integration.md#agent-skill)).
+Its `metadata.version` must equal the package version:
+
+- `tests/test_skill.py` checks the version, the frontmatter, and the reference
+    links.
+- The `skill-version` pre-commit hook runs when `pyproject.toml` or the skill's
+    `SKILL.md` is staged, and rejects a commit whose versions differ.
+- `just skill-refresh` prints a prompt for Claude Code or Codex. The agent reads
+    the git history since the skill was last updated, updates the skill, and
+    sets its version with `scripts/sync-skill-version.sh`.
+
+When a change affects settings, the template tag, widgets, the management
+command, system checks, or error messages, update the skill in the same pull
+request.
 
 ## Documentation
 

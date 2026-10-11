@@ -117,20 +117,31 @@ All pull requests are reviewed. The reviewer will check:
 
 Releases are managed by the maintainers:
 
-1. Run `just release-notes` to draft the release. It sends the history since
-    the latest tag to `claude -p` with all tools disabled and writes a suggested
-    version bump, CHANGELOG entries, and GitHub release notes to
-    `.release/release.md`.
+1. Run `just release-notes` to draft the release with the
+    [Claude Code](https://docs.claude.com/en/docs/claude-code) CLI. It sends the
+    commits, diffs, and CHANGELOG sections since the latest tag to `claude -p`
+    with all tools disabled, and writes a suggested version bump, CHANGELOG
+    entries, and GitHub release notes to `.release/release.md`. Pass
+    `--dry-run` to write only the context and prompt, or `--from`/`--to` to
+    choose the range.
 
 2. Review the draft and add its entries to `CHANGELOG.md` under a
     `## [X.Y.Z] - YYYY-MM-DD` heading, and update the link references at the
     bottom.
 
-3. Run `just bump-patch`, `just bump-minor`, or `just bump-major`.
+3. Run `just bump-patch`, `just bump-minor`, or `just bump-major` to update the
+    package version and lockfile.
 
-4. Open a pull request with the version and changelog changes and merge it.
+4. Run `just skill-refresh` and paste the prompt it prints into Claude Code or
+    Codex. The agent reads the git history since the skill was last updated,
+    updates the agent skill, and sets its version. Review that diff. The
+    `skill-version` pre-commit hook and the test suite reject a version bump
+    without a skill refresh.
 
-5. Tag the merge commit and push the tag:
+5. Open a pull request with the version, changelog, and skill changes and merge
+    it.
+
+6. Tag the merge commit and push the tag:
 
     ```bash
     git tag -a vX.Y.Z -m "django-daisy-forms X.Y.Z"
@@ -142,6 +153,9 @@ The release workflow checks that the tag matches the package version and that
 both distributions, publishes to PyPI through Trusted Publishing with
 provenance attestations, and creates a GitHub Release with the changelog
 section and the distribution files.
+
+Before the first release, configure a PyPI trusted publisher for this GitHub
+repository and the `pypi` GitHub Actions environment.
 
 ## Reporting issues
 

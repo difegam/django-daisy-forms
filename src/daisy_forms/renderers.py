@@ -10,3 +10,7 @@ class DaisyFormRenderer(TemplatesSetting):
     formset_template_name = "daisy_forms/formset.html"
     field_template_name = "daisy_forms/field.html"
     bound_field_class = DaisyBoundField
+
+
+class DaisyHorizontalFormRenderer(DaisyFormRenderer):
+    field_template_name = "daisy_forms/field_horizontal.html"

@@ -13,6 +13,15 @@ release.
 
 - `just release-notes`, which drafts the version bump, CHANGELOG entry, and
   GitHub release notes from git history with `claude -p`.
+- `DaisyHorizontalFormRenderer`, which renders every field with
+  `field_horizontal.html`. Set it as `FORM_RENDERER` or as a form's
+  `default_renderer`.
+
+### Changed
+
+- Grouped choices (optgroups) in `RadioSelect` and `CheckboxSelectMultiple`
+  render each group as `<div role="group">` labelled by a `fieldset-legend`
+  heading instead of a bare `<div>`.
 
 ## [0.1.0] - 2026-10-08
 

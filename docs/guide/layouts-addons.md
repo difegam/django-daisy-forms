@@ -15,6 +15,24 @@ The `field_horizontal.html` template places the label beside the control at larg
 
 On narrow screens, the label and control stack vertically. From the `md` breakpoint, they sit side by side.
 
+To make every field horizontal, use `DaisyHorizontalFormRenderer`. Set it globally:
+
+```python
+FORM_RENDERER = "daisy_forms.renderers.DaisyHorizontalFormRenderer"
+```
+
+Or for one form, with Django's `default_renderer` attribute:
+
+```python
+from daisy_forms.renderers import DaisyHorizontalFormRenderer
+
+
+class ProfileForm(forms.Form):
+    default_renderer = DaisyHorizontalFormRenderer
+```
+
+`{% daisy_field form.email template="daisy_forms/field.html" %}` still returns a single field to the stacked layout.
+
 ![Horizontal layout](../images/forms-before-after.png)
 
 ## Inline choices
@@ -28,6 +46,8 @@ For `RadioSelect` and `CheckboxSelectMultiple` widgets, use `choices="inline"` t
 ```
 
 The default choice layout is vertical.
+
+Grouped choices (optgroups) render each group as `role="group"` with a heading that labels it, so screen readers announce the group name before its options.
 
 ### Restrictions
 

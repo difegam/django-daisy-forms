@@ -2,8 +2,8 @@
 <summary class="collapse-title font-semibold">{{ fieldset.title }}</summary>
 <div class="collapse-content">{% if fieldset.description %}<p class="label">{{ fieldset.description }}</p>{% endif %}{% include "daisy_forms/_fieldset_rows.html" %}</div>
 </details>
-{% elif fieldset.title %}<fieldset class="fieldset{% if fieldset.extra_class %} {{ fieldset.extra_class }}{% endif %}">
-<legend class="fieldset-legend">{{ fieldset.title }}</legend>
+{% elif fieldset.render_wrapper %}<fieldset class="fieldset{% if fieldset.extra_class %} {{ fieldset.extra_class }}{% endif %}">
+{% if fieldset.title %}<legend class="fieldset-legend">{{ fieldset.title }}</legend>{% endif %}
 {% if fieldset.description %}<p class="label">{{ fieldset.description }}</p>{% endif %}{% include "daisy_forms/_fieldset_rows.html" %}
 </fieldset>
 {% else %}{% include "daisy_forms/_fieldset_rows.html" %}{% endif %}

@@ -66,6 +66,27 @@ def test_safe_description_is_not_escaped() -> None:
     assert "<b>B</b>" in output
 
 
+def test_untitled_declared_fieldset_keeps_metadata_without_empty_legend() -> None:
+    output = render_form(
+        make_form(
+            [
+                (
+                    None,
+                    {
+                        "fields": ["email"],
+                        "description": "Used to sign in.",
+                        "classes": ["bg-base-100"],
+                    },
+                )
+            ]
+        )
+    )
+
+    assert '<fieldset class="fieldset bg-base-100">' in output
+    assert '<p class="label">Used to sign in.</p>' in output
+    assert '<legend class="fieldset-legend"></legend>' not in output
+
+
 def test_tuple_renders_a_grid_row() -> None:
     output = render_form(SignupForm())
 

@@ -37,6 +37,7 @@ class Fieldset:
     rows: Sequence[Row]
     description: str | None = None
     classes: Sequence[str] = field(default_factory=tuple)
+    render_wrapper: bool = True
 
     @property
     def collapsible(self) -> bool:
@@ -128,5 +129,5 @@ def resolve_fieldsets(form: BaseForm) -> list[Fieldset] | None:
         Row([bound]) for bound in form.visible_fields() if bound.name not in seen
     ]
     if remaining:
-        fieldsets.append(Fieldset(title=None, rows=remaining))
+        fieldsets.append(Fieldset(title=None, rows=remaining, render_wrapper=False))
     return fieldsets

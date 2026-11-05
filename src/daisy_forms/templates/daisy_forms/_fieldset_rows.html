@@ -1,0 +1,1 @@
+{% for row in fieldset.rows %}{% if row.grid_class %}<div class="{{ row.grid_class }}">{% for field in row.fields %}{{ field.as_field_group }}{% endfor %}</div>{% else %}{% for field in row.fields %}{{ field.as_field_group }}{% endfor %}{% endif %}{% endfor %}

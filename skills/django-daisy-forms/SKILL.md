@@ -64,6 +64,9 @@ argument is a settings file, template, form module or directory to work on.
   renderer adds them. `input-bordered` is a daisyUI 4 class and does not exist in daisyUI 5.
 - `{% daisy_field %}` has built-in options: `label=`, `label_class=`, `template=`,
   `choices="inline"`, `prefix=` and `suffix=`. Use them instead of custom markup.
+- Sections and rows come from an admin-style `fieldsets` attribute on the form, and
+  per-field options for `{{ form }}` from a `daisy_fields` mapping. Do not reach for
+  django-crispy-forms or hand-built layouts for these.
 - `class=` and `class+=` both append to the daisyUI classes. Neither replaces them.
 - These attributes raise `TemplateSyntaxError` when the template compiles: `on*`,
   `hx-on*`, `x-on*`, `x-init` (with or without a `data-` prefix), `aria-invalid` and

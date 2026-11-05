@@ -1,0 +1,9 @@
+{% if fieldset.collapsible %}<details class="collapse collapse-arrow border border-base-300{% if fieldset.extra_class %} {{ fieldset.extra_class }}{% endif %}"{% if fieldset.has_errors %} open{% endif %}>
+<summary class="collapse-title font-semibold">{{ fieldset.title }}</summary>
+<div class="collapse-content">{% if fieldset.description %}<p class="label">{{ fieldset.description }}</p>{% endif %}{% include "daisy_forms/_fieldset_rows.html" %}</div>
+</details>
+{% elif fieldset.title %}<fieldset class="fieldset{% if fieldset.extra_class %} {{ fieldset.extra_class }}{% endif %}">
+<legend class="fieldset-legend">{{ fieldset.title }}</legend>
+{% if fieldset.description %}<p class="label">{{ fieldset.description }}</p>{% endif %}{% include "daisy_forms/_fieldset_rows.html" %}
+</fieldset>
+{% else %}{% include "daisy_forms/_fieldset_rows.html" %}{% endif %}

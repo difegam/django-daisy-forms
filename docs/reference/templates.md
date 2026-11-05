@@ -33,6 +33,18 @@ The listings below are included from the package source and always match the rel
 --8<-- "src/daisy_forms/templates/daisy_forms/form.html"
 ```
 
+**daisy_forms/fieldset.html** — Renders one entry of a form's `fieldsets`: a titled `<fieldset>`, a collapsible `<details>`, or bare rows for the trailing group of unlisted fields. The `fieldset` context variable has `title`, `description`, `rows`, `collapsible`, `extra_class`, and `has_errors`.
+
+```django
+--8<-- "src/daisy_forms/templates/daisy_forms/fieldset.html"
+```
+
+**daisy_forms/\_fieldset_rows.html** — Renders a fieldset's rows. A row with several fields is wrapped in its `grid_class`.
+
+```django
+--8<-- "src/daisy_forms/templates/daisy_forms/_fieldset_rows.html"
+```
+
 **daisy_forms/formset.html** — Renders a formset: the management form, non-form errors, then each form.
 
 ```django

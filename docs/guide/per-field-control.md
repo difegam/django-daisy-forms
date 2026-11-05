@@ -74,6 +74,23 @@ Use `template=` to change the field template:
 
 See [Layouts & addons](layouts-addons.md) for details on the horizontal template.
 
+## Declaring options on the form
+
+`{% daisy_field %}` options only apply where you use the tag. To apply them whenever a field renders, including `{{ form }}` and `fieldsets`, declare a `daisy_fields` mapping on the form:
+
+```python
+class PricingForm(forms.Form):
+    daisy_fields = {
+        "email": {"hx-post": "/validate/email/", "hx-trigger": "blur"},
+        "price": {"prefix": "$", "suffix": "USD", "class": "input-sm"},
+        "plan": {"choices": "inline"},
+    }
+```
+
+The keys are field names and the values take the same options as the tag: `label`, `label_class`, `template`, `choices`, `prefix`, `suffix`, `class`, and any widget attribute. `class` appends to the daisyUI classes. A `{% daisy_field %}` tag on the same field adds its options on top.
+
+The tag's rules apply. An unknown field name, a non-mapping value, an inline handler (`on*`, `hx-on*`, `x-on*`, `x-init`), or `aria-invalid`/`aria-describedby` raises `ImproperlyConfigured` when the field is first accessed.
+
 ## Reserved options
 
 The following names are reserved and do not become widget attributes:

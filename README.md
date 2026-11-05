@@ -75,8 +75,8 @@ and troubleshooting.
 ## Why django-daisy-forms
 
 - **One setting.** `FORM_RENDERER` switches every `{{ form }}`, `{{ formset }}`
-  and `{{ form.field.as_field_group }}` to daisyUI markup. No FormHelper, no
-  layout DSL.
+  and `{{ form.field.as_field_group }}` to daisyUI markup. No FormHelper and
+  no layout DSL; sections come from an admin-style `fieldsets` attribute.
 - **Built on Django's APIs.** A class registry gives each widget its daisyUI
   component through a custom `BoundField`. Django's global widget templates are
   never overridden, and custom widgets are left alone.
@@ -202,10 +202,28 @@ Unsupported combinations, such as `choices="grid"`, `choices` on a select, or
 when the field renders. The layout classes are part of the `daisy_forms_css`
 output, so regenerate that file when upgrading the package.
 
+### Fieldsets
+
+Group `{{ form }}` output into sections with an admin-style `fieldsets`
+attribute, and apply `{% daisy_field %}` options from the form with
+`daisy_fields`:
+
+```python
+class SignupForm(forms.Form):
+    fieldsets = (
+        ("Account", {"fields": ("email", ("first_name", "last_name"))}),
+        ("Preferences", {"fields": ("plan",), "classes": ("collapse",)}),
+    )
+    daisy_fields = {"plan": {"choices": "inline"}}
+```
+
+A tuple renders a responsive row, and `collapse` renders a `<details>` section
+that needs no JavaScript.
+
 ### Composed forms
 
-Use ordinary Django template markup to group fields and place actions. This
-keeps the form structure in the project, with no package layout API:
+For full control, use ordinary Django template markup to group fields and
+place actions:
 
 ```django
 {% load daisy_forms %}

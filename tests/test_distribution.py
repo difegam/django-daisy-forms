@@ -20,6 +20,8 @@ def test_wheel_contains_renderer_templates(dist_path: Path) -> None:
         names = archive.namelist()
         assert "daisy_forms/templates/daisy_forms/form.html" in names
         assert "daisy_forms/templates/daisy_forms/widgets/radio.html" in names
+        assert "daisy_forms/templates/daisy_forms/formset_table.html" in names
+        assert "daisy_forms/static/daisy_forms/js/formset.js" in names
 
 
 def test_source_distribution_contains_typed_package(dist_path: Path) -> None:

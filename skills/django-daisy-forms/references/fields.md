@@ -75,6 +75,15 @@ daisy_fields = {
 - `daisy_fields` takes the same options as `{% daisy_field %}` and applies everywhere the
   field renders. Unknown names and banned attributes raise `ImproperlyConfigured`.
 
+## Dynamic formsets
+
+Use `daisy_forms/formset_dynamic.html` (cards) or `daisy_forms/formset_table.html`
+(table) through `{% include ... with formset=formset %}`, a formset `template_name`,
+or a renderer's `formset_template_name`. Load
+`{% static 'daisy_forms/js/formset.js' %}` once for Add/Remove; it initialises on
+page load and on `htmx:load`. Saved rows need `can_delete=True` to be removable.
+Never hand-write `TOTAL_FORMS` bookkeeping or clone rows with custom JavaScript.
+
 ## Composed layouts
 
 When the markup needs full control, group fields with plain HTML. There is no FormHelper.

@@ -1,10 +1,14 @@
 from pathlib import Path
 
 from django import forms
+from django.forms import formset_factory
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
 TAILWIND_OUTPUT = Path(__file__).parent.parent / "tailwind" / "preview-output.css"
+FORMSET_JS = (
+    Path(__file__).parents[2] / "src/daisy_forms/static/daisy_forms/js/formset.js"
+)
 
 
 class FormPreview(forms.Form):
@@ -40,3 +44,41 @@ def preview_css(request: HttpRequest) -> HttpResponse:
             content_type="text/plain; charset=utf-8",
         )
     return HttpResponse(TAILWIND_OUTPUT.read_text(), content_type="text/css")
+
+
+class ItemForm(forms.Form):
+    name = forms.CharField()
+    quantity = forms.IntegerField(min_value=1)
+
+
+SavedItemFormSet = formset_factory(ItemForm, extra=0, can_delete=True)
+LineFormSet = formset_factory(
+    ItemForm, extra=1, min_num=1, max_num=3, validate_min=True, validate_max=True
+)
+
+
+def preview_formset(request: HttpRequest) -> HttpResponse:
+    data = request.POST if request.method == "POST" else None
+    saved = SavedItemFormSet(
+        data,
+        prefix="saved",
+        initial=[{"name": "Apples", "quantity": 2}, {"name": "Pears", "quantity": 1}],
+    )
+    lines = LineFormSet(data, prefix="lines")
+    if data is not None:
+        saved.is_valid()
+        lines.is_valid()
+    return render(
+        request,
+        "browser/formset_preview.html",
+        {
+            "saved": saved,
+            "lines": lines,
+            "fragment": LineFormSet(prefix="swapped"),
+            "nojs": "nojs" in request.GET,
+        },
+    )
+
+
+def preview_formset_js(request: HttpRequest) -> HttpResponse:
+    return HttpResponse(FORMSET_JS.read_text(), content_type="text/javascript")

@@ -1,16 +1,19 @@
-"""Template tags for rendering individual daisyUI fields."""
+"""Template tags and filters for daisyUI fields, fieldsets, and formsets."""
 
 from __future__ import annotations
 
 import copy
 import re
 from dataclasses import dataclass
+from typing import Any
 
 from django import template
 from django.forms import BoundField
 from django.forms.forms import BaseForm
+from django.forms.formsets import BaseFormSet
 from django.template import TemplateSyntaxError
 from django.template.base import FilterExpression, Parser, Token
+from django.utils.translation import gettext
 
 from ..boundfield import DaisyBoundField, is_allowed_attribute, option_text
 from ..layout import Fieldset, resolve_fieldsets
@@ -75,3 +78,51 @@ def daisy_fieldsets(form: BaseForm) -> list[Fieldset] | None:
     """Return the form's resolved fieldsets, or ``None`` when it declares none."""
 
     return resolve_fieldsets(form)
+
+
+@register.filter
+def daisy_formset_noun(formset: BaseFormSet[Any]) -> str | None:
+    """Return the verbose name of a model formset's model, if any."""
+
+    model = getattr(formset, "model", None)
+    return str(model._meta.verbose_name) if model is not None else None
+
+
+@register.filter
+def daisy_hidden_errors(form: BaseForm) -> list[str]:
+    """Return a form's hidden-field errors, labelled the way Django does."""
+
+    return [
+        gettext("(Hidden field %(name)s) %(error)s")
+        % {"name": field.name, "error": str(error)}
+        for field in form.hidden_fields()
+        for error in field.errors
+    ]
+
+
+@register.inclusion_tag("daisy_forms/_formset_cell.html")
+def daisy_cell(field: BoundField, formset_prefix: str) -> dict[str, object]:
+    """Render a field as a table cell labelled by its column header."""
+
+    label_id = f"{formset_prefix}-{field.name}-label"
+    attrs: dict[str, str | bool] | None = (
+        None if field.use_fieldset else {"aria-labelledby": label_id}
+    )
+    widget = field.as_widget(attrs=attrs)
+    hidden_initial = (
+        field.as_hidden(only_initial=True) if field.field.show_hidden_initial else ""
+    )
+    return {
+        "field": field,
+        "label_id": label_id,
+        "widget": widget,
+        "hidden_initial": hidden_initial,
+    }
+
+
+@register.filter
+def daisy_column_count(formset: BaseFormSet[Any]) -> int:
+    """Return the number of columns in a table formset, including actions."""
+
+    fields = formset.empty_form.visible_fields()
+    return sum(1 for field in fields if field.name != "DELETE") + 1

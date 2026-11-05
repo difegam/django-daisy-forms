@@ -32,9 +32,17 @@ Learn how django-daisy-forms works, from basic rendering to advanced customizati
 
     ______________________________________________________________________
 
-    Horizontal fields, inline choices, and text prefix/suffix addons.
+    Horizontal fields, fieldsets, inline choices, and text prefix/suffix addons.
 
     [:octicons-arrow-right-24: Layouts](layouts-addons.md)
+
+- :material-table-row-plus-after:{ .lg .middle } **Formsets**
+
+    ______________________________________________________________________
+
+    Card and table formsets with accessible add and remove controls.
+
+    [:octicons-arrow-right-24: Formsets](formsets.md)
 
 - :material-palette:{ .lg .middle } **Tailwind CSS integration**
 

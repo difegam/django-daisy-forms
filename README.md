@@ -87,7 +87,8 @@ and troubleshooting.
   choices, or text addons. It refuses inline event handlers.
 - **CSS that can't drift.** A management command writes the Tailwind
   `@source inline()` file, and `--check` fails CI when it is out of date.
-- **Small footprint.** One runtime dependency, Django, and no JavaScript.
+- **Small footprint.** One runtime dependency, Django. Forms need no
+  JavaScript; an optional script adds rows to dynamic formsets.
 
 ## Agent skill
 

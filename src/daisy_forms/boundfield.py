@@ -329,3 +329,17 @@ class DaisyBoundField(BoundField):
             rendered_widget,
             suffix,
         )
+
+    def as_hidden(
+        self,
+        attrs: dict[str, str | bool] | None = None,
+        **kwargs: object,
+    ) -> SafeString:
+        """Render the hidden value without visible-only field options."""
+
+        clone = copy.copy(self)
+        clone.choice_layout = None
+        clone.prefix = None
+        clone.suffix = None
+        clone.extra_attrs = MappingProxyType({})
+        return BoundField.as_hidden(clone, attrs, **kwargs)

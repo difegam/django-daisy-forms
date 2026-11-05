@@ -51,6 +51,16 @@ The listings below are included from the package source and always match the rel
 --8<-- "src/daisy_forms/templates/daisy_forms/formset.html"
 ```
 
+**daisy_forms/formset_dynamic.html** and **daisy_forms/formset_table.html** — Opt-in formsets for `daisy_forms/js/formset.js`, as cards or as table rows. See [Formsets](../guide/formsets.md). They share these partials:
+
+- `_formset_wrapper.html` renders the `data-daisy-formset` wrapper, with translated labels as data attributes, the management form, non-form errors, the layout body (`_formset_cards.html` or `_formset_table_body.html`), the Add button, and the live region.
+- `_formset_card.html` renders one form as a card.
+- `_formset_row.html` renders one form as a `<tbody>`, and `_formset_cell.html` one field as a cell labelled by its header (through the `{% daisy_cell %}` tag).
+
+```django
+--8<-- "src/daisy_forms/templates/daisy_forms/_formset_wrapper.html"
+```
+
 ## Field templates
 
 **daisy_forms/field.html** — The default field template. Single checkboxes and toggles render the control inside a label. Grouped choices use fieldset and legend. Other widgets get a fieldset-legend label followed by help text, errors, and the control.

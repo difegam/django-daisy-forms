@@ -38,7 +38,7 @@ attribute so it shows up in the right place in `just`.
 just test
 ```
 
-This runs pytest with coverage. The project requires at least 94% coverage. For optional browser validation of layouts, use Node 20 or later:
+This runs pytest with coverage. The project requires at least 94% coverage. Browser checks for layouts and the formset script also run in CI. To run them locally, use Node 20 or later:
 
 ```bash
 just browser-setup

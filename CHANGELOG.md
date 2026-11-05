@@ -22,6 +22,16 @@ release.
   section that opens when it contains errors.
 - `daisy_fields` form attribute that applies `{% daisy_field %}` options to a
   field wherever it renders, with the same attribute rules.
+- `daisy_forms/formset_dynamic.html` (cards) and `daisy_forms/formset_table.html`
+  (table rows) formset templates, and the optional
+  `static/daisy_forms/js/formset.js` script that adds and removes rows with
+  accessible buttons, focus handling, undo for saved rows, `min_num`/`max_num`
+  limits, and live announcements. Without the script, the `DELETE` checkbox
+  still works.
+- Browser tests for the formset script run in CI.
+
+Regenerate the `daisy_forms_css` output: this release adds layout, card,
+button, table, and collapse classes.
 
 ### Changed
 

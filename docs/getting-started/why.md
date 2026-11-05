@@ -32,7 +32,7 @@ django-daisy-forms takes a different path.
 
 **CSS that can't drift.** A management command writes the Tailwind `@source inline()` file, and `--check` fails CI when it is out of date. Your Tailwind build always knows about every daisyUI class the package emits.
 
-**Small footprint.** One runtime dependency (Django), no JavaScript, no Alpine, no build step beyond what your project already has.
+**Small footprint.** One runtime dependency (Django), no Alpine, and no build step beyond what your project already has. Forms render without JavaScript; dynamic formsets use an optional plain script.
 
 ## Design principles
 

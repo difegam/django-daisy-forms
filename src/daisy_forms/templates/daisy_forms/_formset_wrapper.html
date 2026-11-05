@@ -1,0 +1,8 @@
+{% load i18n daisy_forms %}<div data-daisy-formset data-prefix="{{ formset.prefix }}" data-remove-label="{% translate "Remove" %}" data-undo-label="{% translate "Undo remove" %}" data-added-message="{% translate "Row added." %}" data-removed-message="{% translate "Row removed." %}" data-restored-message="{% translate "Row restored." %}" class="flex flex-col gap-4">
+{{ formset.management_form }}
+{% if formset.non_form_errors %}<div role="alert" class="alert alert-error alert-soft"><ul>{% for error in formset.non_form_errors %}<li>{{ error }}</li>{% endfor %}</ul></div>
+{% endif %}
+{% include body_template %}
+<div><button type="button" class="btn btn-soft btn-sm" data-daisy-formset-add hidden>{% with noun=formset|daisy_formset_noun %}{% if noun %}{% blocktranslate %}Add {{ noun }}{% endblocktranslate %}{% else %}{% translate "Add another" %}{% endif %}{% endwith %}</button></div>
+<p class="sr-only" role="status" aria-live="polite" data-daisy-formset-status></p>
+</div>

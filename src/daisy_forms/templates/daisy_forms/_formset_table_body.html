@@ -1,0 +1,7 @@
+{% load i18n %}<div class="overflow-x-auto">
+<table class="table" data-daisy-formset-forms>
+<thead><tr>{% for field in formset.empty_form.visible_fields %}{% if field.name != "DELETE" %}<th scope="col" id="{{ formset.prefix }}-{{ field.name }}-label">{{ field.label }}{% if field.field.required %}<span class="text-error" aria-hidden="true"> *</span>{% endif %}{% if field.help_text %}<span class="label block font-normal">{{ field.help_text }}</span>{% endif %}</th>{% endif %}{% endfor %}<th scope="col"><span class="sr-only">{% translate "Remove" %}</span></th></tr></thead>
+{% for form in formset %}{% include "daisy_forms/_formset_row.html" %}{% endfor %}
+</table>
+</div>
+<template data-daisy-formset-template>{% include "daisy_forms/_formset_row.html" with form=formset.empty_form %}</template>

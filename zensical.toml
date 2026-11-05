@@ -23,6 +23,7 @@ nav = [
         { "Validation & Errors" = "guide/validation.md" },
         { "Per-Field Control" = "guide/per-field-control.md" },
         { "Layouts & Addons" = "guide/layouts-addons.md" },
+        { "Formsets" = "guide/formsets.md" },
         { "Tailwind CSS Integration" = "guide/tailwind-css.md" },
         { "Themes" = "guide/themes.md" },
         { "Troubleshooting" = "guide/troubleshooting.md" },

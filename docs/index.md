@@ -95,7 +95,7 @@ Render `{{ form }}` as usual — every field now renders with daisyUI markup.
 | Server-authoritative errors | Errors use `aria-invalid` and `aria-describedby` ids that Django already generates. No client-side validation.                                      |
 | Per-field control           | `{% daisy_field %}` merges classes, passes `hx-*` attributes, and opts fields into horizontal layouts, inline choices, or text addons.              |
 | CSS that can't drift        | A management command writes the Tailwind `@source inline()` file, and `--check` fails CI when it is out of date.                                    |
-| Small footprint             | One runtime dependency (Django), no JavaScript.                                                                                                     |
+| Small footprint             | One runtime dependency (Django). Forms need no JavaScript; an optional script adds rows to dynamic formsets.                                        |
 
 ## Support
 

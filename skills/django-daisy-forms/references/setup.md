@@ -25,7 +25,9 @@ FORM_RENDERER = "daisy_forms.renderers.DaisyFormRenderer"
 
 `TEMPLATES` must include a backend that loads app templates, such as `APP_DIRS: True`.
 A subclass of `DaisyFormRenderer` is accepted. Use one only to change templates
-project-wide.
+project-wide. `daisy_forms.renderers.DaisyHorizontalFormRenderer` is a built-in
+subclass that renders every field with `field_horizontal.html`; set it globally
+or on one form with `default_renderer = DaisyHorizontalFormRenderer`.
 
 ## 3. Check
 

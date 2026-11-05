@@ -63,6 +63,8 @@ The listings below are included from the package source and always match the rel
 --8<-- "src/daisy_forms/templates/daisy_forms/field_horizontal.html"
 ```
 
+`DaisyHorizontalFormRenderer` uses this template for every field.
+
 ## Widget templates
 
 The renderer swaps these in on a copy of stock RadioSelect, CheckboxSelectMultiple, and ClearableFileInput widgets. Widgets with custom templates are left unchanged.
@@ -101,6 +103,12 @@ The renderer swaps these in on a copy of stock RadioSelect, CheckboxSelectMultip
 
 ```django
 --8<-- "src/daisy_forms/templates/daisy_forms/widgets/checkbox_select_inline.html"
+```
+
+**daisy_forms/widgets/\_optgroups.html** — Shared by the four choice templates. Renders each optgroup as `role="group"` labelled by its heading (`aria-label` when the field has no id), and ungrouped options directly.
+
+```django
+--8<-- "src/daisy_forms/templates/daisy_forms/widgets/_optgroups.html"
 ```
 
 **daisy_forms/widgets/clearable_file_input.html** — Renders ClearableFileInput with the current file link and clear checkbox.

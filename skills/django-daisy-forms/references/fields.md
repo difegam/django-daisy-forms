@@ -30,7 +30,7 @@ with daisyUI classes yourself.
 | `label="Work email"` | Replaces the label text |
 | `label_class="font-semibold"` | Appends classes to the main label or the choice-group legend, not to option labels |
 | `template="daisy_forms/field_horizontal.html"` | Uses another field template. The horizontal one stacks on mobile and puts label and control side by side from `md` |
-| `choices="inline"` | Lays out stock `RadioSelect`/`CheckboxSelectMultiple` options in a wrapping row. `inline` is the only value |
+| `choices="inline"` | Lays out stock `RadioSelect`/`CheckboxSelectMultiple` options in a wrapping row. `inline` is the only value. Optgroups render as labelled `role="group"` blocks in either layout |
 | `prefix="$"` `suffix="USD"` | Joins escaped plain-text addons to a stock single-line input. Addons copy the input's size, color and error modifiers |
 | `class="..."` or `class+="..."` | Both append to the daisyUI classes |
 | any other `name="value"` | Becomes a widget attribute, for example `hx-post`, `placeholder`, `autocomplete` or `data-*` |

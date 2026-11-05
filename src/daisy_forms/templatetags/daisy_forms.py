@@ -8,18 +8,18 @@ from dataclasses import dataclass
 
 from django import template
 from django.forms import BoundField
+from django.forms.forms import BaseForm
 from django.template import TemplateSyntaxError
 from django.template.base import FilterExpression, Parser, Token
 
-from ..boundfield import DaisyBoundField, merge_class
+from ..boundfield import DaisyBoundField, is_allowed_attribute, option_text
+from ..layout import Fieldset, resolve_fieldsets
 
 register = template.Library()
 
 _ATTRIBUTE_RE = re.compile(
     r"^(?P<name>[A-Za-z_][A-Za-z0-9_:.-]*)(?P<op>\+=|=)(?P<value>.+)$"
 )
-_RESERVED_ATTRIBUTES = frozenset({"aria-invalid", "aria-describedby"})
-_INLINE_HANDLER_RE = re.compile(r"^(?:data-)?(?:on|hx-on|x-on|x-init)")
 
 
 @dataclass
@@ -41,29 +41,10 @@ class DaisyFieldNode(template.Node):
             )
 
         clone = copy.copy(bound_field)
-        extra_attrs = dict(bound_field.extra_attrs)
-
-        for name, expression in self.attributes:
-            resolved = expression.resolve(context)
-            value = "" if resolved is None else str(resolved)
-            if name == "label":
-                clone.label = value
-            elif name == "label_class":
-                clone.label_class = value
-            elif name == "template":
-                clone.template_override = value
-            elif name == "choices":
-                clone.choice_layout = value
-            elif name == "prefix":
-                clone.prefix = value
-            elif name == "suffix":
-                clone.suffix = value
-            elif name == "class":
-                extra_attrs["class"] = merge_class(extra_attrs.get("class"), value)
-            else:
-                extra_attrs[name] = value
-
-        clone.extra_attrs = extra_attrs
+        clone.apply_options(
+            (name, option_text(expression.resolve(context)))
+            for name, expression in self.attributes
+        )
         return clone.as_field_group()
 
 
@@ -80,11 +61,17 @@ def daisy_field(parser: Parser, token: Token) -> DaisyFieldNode:
             raise TemplateSyntaxError(f"Invalid daisy_field attribute: {bit}")
         name = match.group("name")
         operator = match.group("op")
-        lowered = name.lower()
-        if _INLINE_HANDLER_RE.match(lowered) or lowered in _RESERVED_ATTRIBUTES:
+        if not is_allowed_attribute(name):
             raise TemplateSyntaxError(f"Attribute is not allowed: {name}")
         if operator == "+=" and name != "class":
             raise TemplateSyntaxError("Only class supports +=")
         attributes.append((name, parser.compile_filter(match.group("value"))))
 
     return DaisyFieldNode(parser.compile_filter(bits[1]), attributes)
+
+
+@register.filter
+def daisy_fieldsets(form: BaseForm) -> list[Fieldset] | None:
+    """Return the form's resolved fieldsets, or ``None`` when it declares none."""
+
+    return resolve_fieldsets(form)

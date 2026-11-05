@@ -51,9 +51,33 @@ Rules, all enforced with `TemplateSyntaxError`:
 Classes passed here and to `label_class` come from project templates. Tailwind must
 scan those templates (see [tailwind.md](tailwind.md)).
 
+## Fieldsets and form-level options
+
+For sections, declare admin-style `fieldsets` and keep `{{ form }}`:
+
+```python
+fieldsets = (
+    (
+        "Account",
+        {"fields": ("email", ("first_name", "last_name")), "description": "..."},
+    ),
+    ("Preferences", {"fields": ("plan",), "classes": ("collapse",)}),
+)
+daisy_fields = {
+    "price": {"prefix": "$", "suffix": "USD"},
+    "plan": {"choices": "inline"},
+}
+```
+
+- A tuple is a row of 2–4 fields (`md:grid-cols-N`); row fields stay stacked under the
+  horizontal renderer. `"collapse"` makes a `<details>` section that opens on errors.
+- Unlisted visible fields render after the fieldsets; hidden fields render at the end.
+- `daisy_fields` takes the same options as `{% daisy_field %}` and applies everywhere the
+  field renders. Unknown names and banned attributes raise `ImproperlyConfigured`.
+
 ## Composed layouts
 
-Group fields with plain HTML. The package has no layout DSL or FormHelper.
+When the markup needs full control, group fields with plain HTML. There is no FormHelper.
 
 ```django
 {% load daisy_forms %}

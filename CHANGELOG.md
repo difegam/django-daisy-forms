@@ -16,6 +16,12 @@ release.
 - `DaisyHorizontalFormRenderer`, which renders every field with
   `field_horizontal.html`. Set it as `FORM_RENDERER` or as a form's
   `default_renderer`.
+- `fieldsets` form attribute, shaped like the Django admin's, that groups
+  `{{ form }}` output into `<fieldset>` sections. Tuples render responsive
+  rows of up to four fields and the `collapse` class renders a `<details>`
+  section that opens when it contains errors.
+- `daisy_fields` form attribute that applies `{% daisy_field %}` options to a
+  field wherever it renders, with the same attribute rules.
 
 ### Changed
 

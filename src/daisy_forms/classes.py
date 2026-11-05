@@ -62,6 +62,18 @@ LAYOUT_CLASSES: Final[frozenset[str]] = frozenset(
         "alert",
         "alert-error",
         "alert-soft",
+        "grid",
+        "gap-4",
+        "md:grid-cols-2",
+        "md:grid-cols-3",
+        "md:grid-cols-4",
+        "collapse",
+        "collapse-arrow",
+        "collapse-title",
+        "collapse-content",
+        "border",
+        "border-base-300",
+        "font-semibold",
     }
 )
 

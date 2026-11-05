@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import copy
 import re
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from types import MappingProxyType
 from typing import Any, Final, cast
 
+from django.core.exceptions import ImproperlyConfigured
 from django.forms.boundfield import BoundField
+from django.forms.fields import Field
+from django.forms.forms import BaseForm
 from django.forms.widgets import CheckboxSelectMultiple, Input, RadioSelect, Widget
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from django.utils.html import format_html
@@ -53,8 +56,51 @@ _INLINE_DAISY_TEMPLATES: Final[Mapping[str, str]] = {
 }
 
 
+_RESERVED_ATTRIBUTES: Final = frozenset({"aria-invalid", "aria-describedby"})
+_INLINE_HANDLER_RE: Final = re.compile(r"^(?:data-)?(?:on|hx-on|x-on|x-init)")
+
+
 def merge_class(existing: str | None, extra: str) -> str:
     return " ".join(part for part in (existing, extra) if part)
+
+
+def option_text(value: object) -> str:
+    return "" if value is None else str(value)
+
+
+def is_allowed_attribute(name: str) -> bool:
+    """Return whether a field option or widget attribute name may be set."""
+
+    lowered = name.lower()
+    return not (_INLINE_HANDLER_RE.match(lowered) or lowered in _RESERVED_ATTRIBUTES)
+
+
+def _declared_field_options(form: BaseForm, name: str) -> Mapping[str, object]:
+    """Return the validated ``daisy_fields`` options a form declares for a field."""
+
+    declared = getattr(form, "daisy_fields", None)
+    if not declared:
+        return {}
+    form_name = type(form).__name__
+    if not isinstance(declared, Mapping):
+        raise ImproperlyConfigured(f"{form_name}.daisy_fields must be a mapping.")
+    unknown = [key for key in declared if key not in form.fields]
+    if unknown:
+        raise ImproperlyConfigured(
+            f"{form_name}.daisy_fields names unknown fields: {', '.join(unknown)}."
+        )
+    options = declared.get(name) or {}
+    if not isinstance(options, Mapping):
+        raise ImproperlyConfigured(
+            f"{form_name}.daisy_fields[{name!r}] must be a mapping."
+        )
+    for option in options:
+        if not is_allowed_attribute(str(option)):
+            raise ImproperlyConfigured(
+                f"{form_name}.daisy_fields[{name!r}]: attribute is not allowed: "
+                f"{option}"
+            )
+    return cast(Mapping[str, object], options)
 
 
 def _uses_stock_template(widget: Widget) -> bool:
@@ -103,6 +149,37 @@ class DaisyBoundField(BoundField):
     choice_layout: str | None = None
     prefix: str | None = None
     suffix: str | None = None
+
+    def __init__(self, form: BaseForm, field: Field, name: str) -> None:
+        super().__init__(form, field, name)
+        options = _declared_field_options(form, name)
+        if options:
+            self.apply_options(
+                (key, option_text(value)) for key, value in options.items()
+            )
+
+    def apply_options(self, options: Iterable[tuple[str, str]]) -> None:
+        """Apply ``{% daisy_field %}``-style options to this bound field."""
+
+        extra_attrs = dict(self.extra_attrs)
+        for name, value in options:
+            if name == "label":
+                self.label = value
+            elif name == "label_class":
+                self.label_class = value
+            elif name == "template":
+                self.template_override = value
+            elif name == "choices":
+                self.choice_layout = value
+            elif name == "prefix":
+                self.prefix = value
+            elif name == "suffix":
+                self.suffix = value
+            elif name == "class":
+                extra_attrs["class"] = merge_class(extra_attrs.get("class"), value)
+            else:
+                extra_attrs[name] = value
+        self.extra_attrs = extra_attrs
 
     @property
     def template_name(self) -> str:

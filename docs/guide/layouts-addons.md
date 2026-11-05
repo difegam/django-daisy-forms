@@ -130,6 +130,35 @@ Addon values are escaped and do not accept HTML or icon markup:
 
 To use icons or complex markup, override the field template.
 
+## Fieldsets
+
+Declare a `fieldsets` attribute to group `{{ form }}` output into sections. The shape matches the Django admin's:
+
+```python
+class SignupForm(forms.Form):
+    email = forms.EmailField()
+    first_name = forms.CharField()
+    last_name = forms.CharField()
+    plan = forms.ChoiceField(choices=PLANS, widget=forms.RadioSelect)
+    notes = forms.CharField(required=False)
+
+    fieldsets = (
+        ("Account", {
+            "fields": ("email", ("first_name", "last_name")),
+            "description": "Used to sign in.",
+        }),
+        ("Preferences", {"fields": ("plan",), "classes": ("collapse",)}),
+    )
+```
+
+- Each entry renders a `<fieldset class="fieldset">` with a `fieldset-legend` and the escaped description.
+- A tuple inside `fields` renders up to four fields side by side from the `md` breakpoint (`grid gap-4 md:grid-cols-N`). Fields in a row always use the stacked template, even under `DaisyHorizontalFormRenderer`, unless `daisy_fields` sets a `template`.
+- `"collapse"` in `classes` renders the section as a daisyUI `collapse` on `<details>`, so it works without JavaScript. It opens automatically when one of its fields has an error. Other classes are added to the section.
+- Visible fields that no fieldset lists render after the fieldsets, without a wrapper. Hidden fields always render at the end.
+- An unknown or repeated field name, a malformed entry, or a row of more than four fields raises `ImproperlyConfigured` when the form renders.
+
+Forms without `fieldsets` render exactly as before. Forms in a formset use their own `fieldsets`.
+
 ## Combining layouts
 
 You can combine horizontal fields with inline choices and addons:
@@ -160,7 +189,7 @@ You can combine horizontal fields with inline choices and addons:
 
 ## Composed forms
 
-Use ordinary Django template markup to group fields and place actions. This keeps the form structure in your project, with no package layout API:
+When you need full control over the markup, use ordinary Django template markup to group fields and place actions:
 
 ```django
 {% load daisy_forms %}

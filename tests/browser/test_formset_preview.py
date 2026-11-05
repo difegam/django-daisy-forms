@@ -37,7 +37,7 @@ def expect(locator: "Locator") -> "LocatorAssertions":
 
 
 def total(page: "Page", prefix: str) -> str:
-    return page.locator(f'input[name="{prefix}-TOTAL_FORMS"]').input_value()
+    return str(page.locator(f'input[name="{prefix}-TOTAL_FORMS"]').input_value())
 
 
 def test_add_appends_a_numbered_row_and_moves_focus(page: "Page") -> None:

@@ -26,6 +26,28 @@ class ItemForm(forms.Form):
         return cleaned
 
 
+class HiddenInitialForm(forms.Form):
+    name = forms.CharField(show_hidden_initial=True)
+
+
+class HiddenInitialOptionsForm(forms.Form):
+    amount = forms.DecimalField(show_hidden_initial=True)
+    plan = forms.ChoiceField(
+        choices=[("basic", "Basic"), ("pro", "Pro")],
+        show_hidden_initial=True,
+        widget=forms.RadioSelect,
+    )
+
+    daisy_fields = {  # noqa: RUF012
+        "amount": {"prefix": "$"},
+        "plan": {"choices": "inline"},
+    }
+
+
+class HiddenOnlyForm(forms.Form):
+    token = forms.CharField(widget=forms.HiddenInput)
+
+
 def make_formset(
     *,
     data: dict[str, str] | None = None,
@@ -88,6 +110,36 @@ def test_table_headers_label_their_column_cells() -> None:
         output
     )
     assert '<span class="sr-only" id="id_items-0-name_helptext">' in output
+
+
+def test_table_renders_hidden_initial_widgets() -> None:
+    formset_class = formset_factory(HiddenInitialForm, extra=1)
+    output = formset_class(prefix="items", initial=[{"name": "Alice"}]).render(TABLE)
+
+    assert 'name="items-0-name"' in output
+    assert 'name="initial-items-0-name"' in output
+    assert 'value="Alice"' in output
+
+
+def test_table_renders_hidden_initial_widgets_with_visible_options() -> None:
+    formset_class = formset_factory(HiddenInitialOptionsForm, extra=1)
+    output = formset_class(
+        prefix="items", initial=[{"amount": "12.50", "plan": "pro"}]
+    ).render(TABLE)
+
+    assert 'name="initial-items-0-amount"' in output
+    assert 'name="initial-items-0-plan"' in output
+    assert 'value="12.50"' in output
+    assert 'value="pro"' in output
+
+
+def test_table_renders_hidden_fields_without_visible_data_columns() -> None:
+    formset_class = formset_factory(HiddenOnlyForm, extra=1, can_delete=True)
+    output = formset_class(prefix="hidden", initial=[{"token": "secret"}]).render(TABLE)
+
+    assert output.count('name="hidden-0-token"') == 1
+    assert 'value="secret"' in output
+    assert 'name="hidden-0-DELETE"' in output
 
 
 def test_table_keeps_an_action_column_without_can_delete() -> None:

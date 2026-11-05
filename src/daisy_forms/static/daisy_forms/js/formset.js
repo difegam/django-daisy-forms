@@ -10,6 +10,7 @@
   const FORM = "[data-daisy-formset-form]";
   const FOCUSABLE =
     "input:not([type=hidden]):not([disabled]), select:not([disabled]), textarea:not([disabled])";
+  const VALIDATION_CONTROLS = "input:not([type=hidden]), select, textarea";
   const RENUMBERED = ["id", "name", "for", "aria-describedby", "aria-labelledby"];
 
   const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -38,6 +39,7 @@
 
     const deletePattern = new RegExp(`^${escapeRegExp(prefix)}-\\d+-DELETE$`);
     const indexPattern = new RegExp(`(${escapeRegExp(prefix)}-)\\d+(-)`, "g");
+    const disabledStates = new WeakMap();
 
     const rows = () =>
       Array.from(list.children).filter((element) => element.matches(FORM));
@@ -65,6 +67,18 @@
       const input = deleteInput(row);
       if (input) input.checked = deleted;
       row.toggleAttribute("data-deleted", deleted);
+      for (const control of inRow(row, VALIDATION_CONTROLS)) {
+        if (control === input) continue;
+        if (deleted) {
+          if (!disabledStates.has(control)) {
+            disabledStates.set(control, control.disabled);
+          }
+          control.disabled = true;
+        } else if (disabledStates.has(control)) {
+          control.disabled = disabledStates.get(control);
+          disabledStates.delete(control);
+        }
+      }
       for (const body of inRow(row, "[data-daisy-formset-body]")) {
         body.inert = deleted;
         body.classList.toggle("opacity-50", deleted);

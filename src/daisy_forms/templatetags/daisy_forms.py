@@ -109,7 +109,15 @@ def daisy_cell(field: BoundField, formset_prefix: str) -> dict[str, object]:
         None if field.use_fieldset else {"aria-labelledby": label_id}
     )
     widget = field.as_widget(attrs=attrs)
-    return {"field": field, "label_id": label_id, "widget": widget}
+    hidden_initial = (
+        field.as_hidden(only_initial=True) if field.field.show_hidden_initial else ""
+    )
+    return {
+        "field": field,
+        "label_id": label_id,
+        "widget": widget,
+        "hidden_initial": hidden_initial,
+    }
 
 
 @register.filter

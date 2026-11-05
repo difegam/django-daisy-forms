@@ -90,12 +90,33 @@ def test_removing_a_saved_row_marks_delete_and_can_be_undone(page: "Page") -> No
     assert page.locator("#id_saved-0-name").evaluate(
         "el => el.closest('[inert]') !== null"
     )
+    assert page.locator("#id_saved-0-quantity").is_disabled()
     expect(saved.get_by_role("status")).to_have_text("Row removed.")
 
     saved.get_by_role("button", name="Undo remove 1").click()
 
     assert not delete.is_checked()
+    assert not delete.is_disabled()
+    assert not page.locator("#id_saved-0-quantity").is_disabled()
     expect(saved.get_by_role("status")).to_have_text("Row restored.")
+
+
+def test_deleted_invalid_saved_row_does_not_block_submission(page: "Page") -> None:
+    page.fill("#id_saved-0-quantity", "0")
+    page.fill("#id_lines-0-name", "Widget")
+    page.fill("#id_lines-0-quantity", "1")
+    form = page.locator("form")
+
+    assert not form.evaluate("form => form.checkValidity()")
+
+    saved = page.locator("#saved")
+    saved.get_by_role("button", name="Remove 1").click()
+
+    assert page.locator("#id_saved-0-quantity").is_disabled()
+    assert not page.locator('input[name="saved-0-DELETE"]').is_disabled()
+    assert form.evaluate("form => form.checkValidity()")
+
+    page.get_by_role("button", name="Submit").click()
 
 
 def test_deleted_saved_row_is_submitted(page: "Page") -> None:

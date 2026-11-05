@@ -43,7 +43,7 @@ With the script loaded:
 
 - **Add** clones `empty_form`, increments `TOTAL_FORMS`, focuses the new row's first field, and processes it with htmx when htmx is present.
 - **Remove** on an unsaved row deletes it from the page, renumbers the rows after it, and decrements `TOTAL_FORMS`.
-- **Remove** on a saved row checks its hidden `DELETE` box, dims it, and makes its fields inert. The same button then reads **Undo remove**. Django deletes the row on submit.
+- **Remove** on a saved row checks its hidden `DELETE` box, dims it, and disables its non-hidden controls so browser validation ignores the row. Hidden identity fields and `DELETE` remain submitted. The same button then reads **Undo remove**. Django deletes the row on submit.
 - Buttons are disabled at the formset's `min_num` and `max_num`.
 - Buttons are real `<button type="button">` elements named with their row number, such as "Remove 2". A polite live region announces each change.
 - `daisy-formset:added` and `daisy-formset:removed` events bubble from the formset with the row `index` in `detail`.
@@ -59,6 +59,7 @@ Without the script the Add and Remove buttons stay hidden, and the `DELETE` chec
 - Each control is labelled by its column header through `aria-labelledby`. Choice groups get a `role="group"` labelled the same way.
 - Help text appears under the header. Each cell also keeps a visually hidden copy with the `{id}_helptext` id that `aria-describedby` references.
 - Field errors appear in their cell with the `{id}_error` id. A form's non-field errors appear in a full-width row above it.
+- Hidden fields are kept in the action cell, including when a form has no visible data columns. Fields with `show_hidden_initial=True` also render their hidden initial value.
 - The table scrolls sideways on narrow screens. Use `formset_dynamic.html` when rows should stack.
 
 ## Translations

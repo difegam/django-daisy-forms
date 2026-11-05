@@ -43,7 +43,7 @@ With the script loaded:
 
 - **Add** clones `empty_form`, increments `TOTAL_FORMS`, focuses the new row's first field, and processes it with htmx when htmx is present.
 - **Remove** on an unsaved row deletes it from the page, renumbers the rows after it, and decrements `TOTAL_FORMS`.
-- **Remove** on a saved row checks its hidden `DELETE` box, dims it, and disables its non-hidden controls so browser validation ignores the row. Hidden identity fields and `DELETE` remain submitted. The same button then reads **Undo remove**. Django deletes the row on submit.
+- **Remove** on a saved row checks its hidden `DELETE` box, dims it, and disables its non-hidden controls so browser validation ignores the row. The row values, hidden identity fields, and `DELETE` are submitted, so undo still works after a validation error. The same button then reads **Undo remove**. Django deletes the row on submit.
 - Buttons are disabled at the formset's `min_num` and `max_num`.
 - Buttons are real `<button type="button">` elements named with their row number, such as "Remove 2". A polite live region announces each change.
 - `daisy-formset:added` and `daisy-formset:removed` events bubble from the formset with the row `index` in `detail`.

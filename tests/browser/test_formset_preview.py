@@ -119,6 +119,17 @@ def test_deleted_invalid_saved_row_does_not_block_submission(page: "Page") -> No
     page.get_by_role("button", name="Submit").click()
 
 
+def test_undo_after_invalid_submission_preserves_deleted_row_values(
+    page: "Page",
+) -> None:
+    page.locator("#id_saved-0-name").fill("Changed apples")
+    page.locator("#saved").get_by_role("button", name="Remove 1").click()
+    page.get_by_role("button", name="Submit").click()
+    page.locator("#saved").get_by_role("button", name="Undo remove 1").click()
+
+    assert page.locator("#id_saved-0-name").input_value() == "Changed apples"
+
+
 def test_deleted_saved_row_is_submitted(page: "Page") -> None:
     page.locator("#saved").get_by_role("button", name="Remove 2").click()
     page.get_by_role("button", name="Submit").click()

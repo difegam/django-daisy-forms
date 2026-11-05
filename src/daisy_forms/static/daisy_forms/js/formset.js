@@ -191,6 +191,26 @@
       }
     });
 
+    const form = container.closest("form");
+    if (form) {
+      form.addEventListener("submit", () => {
+        const controls = rows().filter(isDeleted).flatMap((row) =>
+          inRow(row, VALIDATION_CONTROLS).filter(
+            (control) => disabledStates.has(control) && !disabledStates.get(control),
+          ),
+        );
+        controls.forEach((control) => {
+          control.disabled = false;
+        });
+        setTimeout(() => {
+          controls.forEach((control) => {
+            const row = control.closest(FORM);
+            if (row && isDeleted(row)) control.disabled = true;
+          });
+        }, 0);
+      }, true);
+    }
+
     rows().forEach(prepare);
     refresh();
   }

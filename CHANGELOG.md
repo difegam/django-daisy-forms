@@ -33,6 +33,20 @@ release.
 Regenerate the `daisy_forms_css` output: this release adds layout, card,
 button, table, and collapse classes.
 
+### Fixed
+
+- Explicitly declared untitled fieldsets now retain their description and extra
+  classes instead of rendering only their fields.
+- Table formsets now preserve hidden initial values and hidden fields even when
+  a row has no visible data columns.
+- Removing a saved formset row now suppresses native validation for its visible
+  controls while keeping hidden identity and `DELETE` values submitted.
+- Subclasses of stock input widgets such as `TextInput`, `EmailInput`, and
+  `NumberInput` that keep Django's template now get their daisyUI component and
+  error classes. A `NumberInput` subclass with `input_type = "range"` gets
+  `range` and `range-error`. Previously these subclasses rendered without
+  classes ([#37](https://github.com/difegam/django-daisy-forms/issues/37)).
+
 ### Changed
 
 - Grouped choices (optgroups) in `RadioSelect` and `CheckboxSelectMultiple`

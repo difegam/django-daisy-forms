@@ -103,21 +103,6 @@ def _declared_field_options(form: BaseForm, name: str) -> Mapping[str, object]:
     return cast(Mapping[str, object], options)
 
 
-def _uses_stock_template(widget: Widget) -> bool:
-    template_name = widget.template_name or ""
-    if template_name.startswith("daisy_forms/"):
-        return True
-    if template_name in _DAISY_TEMPLATES:
-        stock_option, _, _ = _DAISY_TEMPLATES[template_name]
-        return getattr(widget, "option_template_name", None) == stock_option
-    if type(widget).__module__ == "django.forms.widgets":
-        return True
-    for widget_type in type(widget).__mro__:
-        if widget_type in WIDGET_CLASSES:
-            return template_name == getattr(widget_type, "template_name", None)
-    return False
-
-
 def _uses_registered_stock_template(widget: Widget) -> bool:
     """Return whether a registered widget still uses its stock template."""
 
@@ -136,6 +121,18 @@ def _uses_registered_stock_template(widget: Widget) -> bool:
                 str | None, getattr(widget_type, "template_name", None)
             )
     return False
+
+
+def _uses_stock_template(widget: Widget) -> bool:
+    template_name = widget.template_name or ""
+    if template_name.startswith("daisy_forms/"):
+        return True
+    if (
+        template_name not in _DAISY_TEMPLATES
+        and type(widget).__module__ == "django.forms.widgets"
+    ):
+        return True
+    return _uses_registered_stock_template(widget)
 
 
 class DaisyBoundField(BoundField):

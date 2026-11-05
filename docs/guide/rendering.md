@@ -104,4 +104,4 @@ Formsets render the management form, non-form errors, then each form:
 
 ## Custom widgets
 
-Custom widgets not in the registry render inside the field wrapper without daisyUI classes. To style a custom widget, subclass a registered widget (e.g., `class MyInput(TextInput)`) or pass classes through widget `attrs`. Third-party widgets with custom templates are left unchanged.
+Custom widgets not in the registry render inside the field wrapper without daisyUI classes. To style a custom widget, subclass a registered widget (e.g., `class MyInput(TextInput)`) or pass classes through widget `attrs`. A subclass that keeps its parent's stock template gets the parent's classes, and the effective input type still decides the component, so `class RangeInput(NumberInput): input_type = "range"` renders with `range`. Third-party widgets with custom templates are left unchanged.

@@ -190,3 +190,53 @@ def test_empty_template_override_does_not_fall_back_to_default() -> None:
 
     with pytest.raises(TemplateDoesNotExist):
         field.as_field_group()
+
+
+class RangeInput(forms.NumberInput):
+    input_type = "range"
+
+
+class PhoneInput(forms.TextInput):
+    pass
+
+
+class WorkEmailInput(forms.EmailInput):
+    pass
+
+
+class StockSubclassForm(forms.Form):
+    discount = forms.IntegerField(widget=RangeInput(attrs={"class": "range-primary"}))
+    phone = forms.CharField(widget=PhoneInput)
+    email = forms.EmailField(widget=WorkEmailInput)
+
+
+@pytest.mark.parametrize(
+    ("name", "classes"),
+    [
+        ("discount", "range range-primary"),
+        ("phone", "input w-full"),
+        ("email", "input w-full"),
+    ],
+    ids=["range", "text", "email"],
+)
+def test_subclasses_of_stock_inputs_get_component_classes(
+    name: str, classes: str
+) -> None:
+    output = str(StockSubclassForm()[name])
+
+    assert f'class="{classes}"' in output
+
+
+@pytest.mark.parametrize(
+    ("name", "classes"),
+    [
+        ("discount", "range range-error range-primary"),
+        ("phone", "input input-error w-full"),
+        ("email", "input input-error w-full"),
+    ],
+    ids=["range", "text", "email"],
+)
+def test_subclasses_of_stock_inputs_get_error_classes(name: str, classes: str) -> None:
+    output = str(StockSubclassForm(data={})[name])
+
+    assert f'class="{classes}"' in output

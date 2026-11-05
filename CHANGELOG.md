@@ -33,6 +33,14 @@ release.
 Regenerate the `daisy_forms_css` output: this release adds layout, card,
 button, table, and collapse classes.
 
+### Fixed
+
+- Subclasses of stock input widgets such as `TextInput`, `EmailInput`, and
+  `NumberInput` that keep Django's template now get their daisyUI component and
+  error classes. A `NumberInput` subclass with `input_type = "range"` gets
+  `range` and `range-error`. Previously these subclasses rendered without
+  classes ([#37](https://github.com/difegam/django-daisy-forms/issues/37)).
+
 ### Changed
 
 - Grouped choices (optgroups) in `RadioSelect` and `CheckboxSelectMultiple`
